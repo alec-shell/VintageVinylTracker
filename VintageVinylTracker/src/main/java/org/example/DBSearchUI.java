@@ -6,29 +6,30 @@ import java.awt.*;
 import java.util.List;
 
 
-public class DBSearchTabUI extends JPanel {
-    private JTable resultsDisplay;
-    private DBAccess dbAccess;
-    private JTextField albumNameJTF = new JTextField();
-    private JTextField artistNameJTF =  new JTextField();
-    private JTextField yearJTF = new JTextField();
+public class DBSearchUI extends JPanel {
+    private final JTable resultsDisplay;
+    private final DBAccess dbAccess;
+    private final JTextField albumNameJTF = new JTextField();
+    private final JTextField artistNameJTF =  new JTextField();
+    private final JTextField yearJTF = new JTextField();
+    private final JTextField countryJTF = new JTextField();
     private JCheckBox ownedSelector = null;
     private final String[] columnNames = new String[]{"Album", "Band", "Year", "Owned",
-            "Condition", "Price", "IsMaster", "ID"};
+            "Condition", "IsMaster", "ID"};
 
 
-    public DBSearchTabUI(DBAccess dbAccess) {
+    public DBSearchUI(DBAccess dbAccess) {
         this.dbAccess = dbAccess;
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         resultsDisplay = new JTable(model);
         this.setBackground(Color.LIGHT_GRAY);
         this.setLayout(new BorderLayout());
-        this.add(buildSearchEntryForm(true, null), BorderLayout.NORTH);
+        this.add(buildSearchEntryForm(), BorderLayout.NORTH);
         this.add(new JScrollPane(resultsDisplay), BorderLayout.CENTER);
     } // constructor
 
 
-    private JPanel buildSearchEntryForm(boolean displaysOwnedSelector, Boolean defaultOwned) {
+    private JPanel buildSearchEntryForm() {
         JPanel searchEntryForm = new JPanel();
         searchEntryForm.setBackground(Color.LIGHT_GRAY);
         searchEntryForm.setLayout(new GridBagLayout());
@@ -48,20 +49,20 @@ public class DBSearchTabUI extends JPanel {
         JPanel yearField = getEntryField("Year: ", yearJTF);
         c.gridy = gridyCounter++;
         searchEntryForm.add(yearField, c);
-        if  (displaysOwnedSelector) {
-            ownedSelector = new JCheckBox(" --- Owned?");
-            c.gridy = gridyCounter++;
-            searchEntryForm.add(ownedSelector, c);
-        }
+        JPanel countryField = getEntryField("Country: ", countryJTF);
+        c.gridy = gridyCounter++;
+        searchEntryForm.add(countryField, c);
+        ownedSelector = new JCheckBox(" --- Owned?");
+        c.gridy = gridyCounter++;
+        searchEntryForm.add(ownedSelector, c);
         JButton submit =  new JButton("Search");
         c.gridy = gridyCounter;
         searchEntryForm.add(submit, c);
-        submit.addActionListener(e -> {
+        submit.addActionListener(_ -> {
             String artist = !artistNameJTF.getText().isBlank() ? artistNameJTF.getText() : null;
             String album = !albumNameJTF.getText().isBlank() ? albumNameJTF.getText() : null;
             String year = !yearJTF.getText().isBlank() ? yearJTF.getText() : null;
-            boolean isOwned = ownedSelector != null ? ownedSelector.isSelected() : defaultOwned;
-            Record[] results = queryDB(artist, album, year,  isOwned);
+            Record[] results = queryDB(artist, album, year, ownedSelector.isSelected());
             updateResultsDisplay(results);
         });
         return searchEntryForm;
@@ -90,13 +91,12 @@ public class DBSearchTabUI extends JPanel {
 
 
     private Record[] queryDB(String name, String album, String year, Boolean isOwned) {
-        List<Record> results = dbAccess.searchEntries(name, album, year, isOwned);
+        List<Record> results = dbAccess.searchRecordEntries(name, album, year, isOwned);
         Record[] rows = new Record[results.size()];
         for (int i = 0; i < rows.length; i++) {
             rows[i] = results.get(i);
         }
         return rows;
     } // queryDB()
-
 
 } // DBSearchTabUI class

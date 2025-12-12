@@ -4,12 +4,13 @@ import javax.swing.*;
 
 public class DiscogsUI extends JPanel {
 
-    public DiscogsUI() {
 
+    public DiscogsUI() {
     } // constructor
 
 
-    private void buildQueryField() {
+    public JPanel buildSearchForm() {
+        return null;
+    } // buildSearchForm()
 
-    }
 } // DiscogsUI class

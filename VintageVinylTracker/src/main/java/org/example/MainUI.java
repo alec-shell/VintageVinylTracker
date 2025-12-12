@@ -10,18 +10,21 @@ import javax.swing.*;
 import java.awt.*;
 
 
-public class TrackerUI extends JFrame {
+public class MainUI extends JFrame {
+    private final DBAccess dbAccess;
     private JTabbedPane tabsPane;
-    private JPanel ownedTab;
-    private JPanel wantedTab;
-    private JPanel searchDBTab;
+    private final DBSearchUI dbSearchUI;
+    private final DiscogsUI webSearchUI;
 
 
-    public TrackerUI() {
+    public MainUI() {
         this.setTitle("Vintage Vinyl Tracker");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(800, 600);
         this.setLayout(new BorderLayout());
+        this.dbAccess = new DBAccess();
+        this.dbSearchUI = new DBSearchUI(dbAccess);
+        this.webSearchUI = new DiscogsUI();
         buildTabbedPane();
         this.add(tabsPane, BorderLayout.CENTER);
     } // constructor
@@ -29,31 +32,14 @@ public class TrackerUI extends JFrame {
 
     private void buildTabbedPane() {
         tabsPane = new JTabbedPane(JTabbedPane.LEFT);
-        buildOwnedTab();
-        buildWantedTab();
-        tabsPane.add("Owned", ownedTab);
-        tabsPane.add("Wanted", wantedTab);
-        tabsPane.add("Search Database", new DBSearchTabUI());
+        tabsPane.add("Search Database",  dbSearchUI);
+        tabsPane.add("Discogs", webSearchUI);
     } // buildTabbedPane()
 
 
-    private void buildOwnedTab() {
-        ownedTab = new JPanel();
-        ownedTab.setBackground(Color.LIGHT_GRAY);
-    } // ownedTab()
-
-
-    private void buildWantedTab() {
-        wantedTab = new JPanel();
-        wantedTab.setBackground(Color.LIGHT_GRAY);
-    } // wantedTab()
-
-
-
     public static void main(String[] args) {
-        JFrame frame = new TrackerUI();
+        JFrame frame = new MainUI();
         frame.setVisible(true);
     } // main()
-
 
 } // TrackerUI class
