@@ -1,6 +1,5 @@
 package org.example;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.*;
 import com.github.scribejava.core.oauth.OAuth10aService;
