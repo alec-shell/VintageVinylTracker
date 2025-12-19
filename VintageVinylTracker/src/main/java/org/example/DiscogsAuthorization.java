@@ -10,72 +10,75 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
 public class DiscogsAuthorization {
     private OAuth1AccessToken accessToken;
     private final Path configPath = Path.of("config.txt");
     private final Path secretsPath = Path.of(".secrets.txt");
+    private OAuth10aService service = null;
     private String username = null;
+    private boolean hasToken = checkForToken();
+    private boolean hasAuthorization = false;
 
     protected DiscogsAuthorization() {
-        OAuth10aService service = null;
         try {
             String[] config = parseConfig();
             service = new ServiceBuilder(config[0])
                     .apiSecret(config[1])
-                    .build(DiscogsAPI.getInstance());
-            if (!checkForToken()) {
+                    .build(ScribeDiscogsAPI.getInstance());
+            if (hasToken) {
                 try {
-                    getAuthorization(service);
-                } catch (IOException | ExecutionException | InterruptedException e) {
-                    throw new RuntimeException(e);
+                    hasAuthorization = verifyAccess();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
         } catch (IOException e) {
             System.out.println("Could not build service: " + e.getMessage());
         }
-        try {
-            verifyAccess(service);
-            if (username != null) System.out.println("Welcome " +  username);
-            else System.out.println("Failed to verify...");
-        }catch (IOException | ExecutionException | InterruptedException e) {
-            System.out.println("Could not verify access: " + e.getMessage());
-        }
     } // constructor
 
-    public void getAuthorization(OAuth10aService service) throws IOException, ExecutionException, InterruptedException {
-        Scanner scanner = new Scanner(System.in);
-        final OAuth1RequestToken requestToken = service.getRequestToken();
-        // redirect user to Discogs authorization url
+    protected OAuth1RequestToken redirectAuthorization() {
         try {
-            Desktop.getDesktop().browse(new URI(service.getAuthorizationUrl(requestToken)));
-        } catch (IOException | URISyntaxException e) {
-            System.out.println("Please visit: " + service.getAuthorizationUrl(requestToken));
+            final OAuth1RequestToken requestToken = service.getRequestToken();
+            try {
+                Desktop.getDesktop().browse(new URI(service.getAuthorizationUrl(requestToken)));
+            } catch (IOException | URISyntaxException e) {
+                System.out.println("Please visit: " + service.getAuthorizationUrl(requestToken));
+            }
+            return requestToken;
+        } catch (IOException | InterruptedException | ExecutionException e) {
+            System.out.println("Could not get request token: " + e.getMessage());
         }
+        return null;
+    } // redirectAuthorization
+
+    protected void getAuthorization(String verifier, OAuth1RequestToken requestToken) throws IOException, ExecutionException, InterruptedException {
         // get user's verifier and request access token from Discogs
-        System.out.println("Enter verifier: ");
-        String verifier = scanner.nextLine();
         accessToken = service.getAccessToken(requestToken, verifier);
-        saveToken(accessToken.getToken(), accessToken.getTokenSecret());
-        scanner.close();
+        if (accessToken.getClass() == OAuth1AccessToken.class) {
+            saveToken(accessToken.getToken(), accessToken.getTokenSecret());
+        }
     } // getAuthorization()
 
-    private void verifyAccess(OAuth10aService service) throws IOException, ExecutionException, InterruptedException {
+    protected boolean verifyAccess() throws IOException, ExecutionException, InterruptedException {
         final OAuthRequest request = new OAuthRequest(Verb.GET, "https://api.discogs.com/oauth/identity");
         service.signRequest(accessToken, request);
         final Response response = service.execute(request);
         String[] body = response.getBody().split(",");
         for (String line : body) {
             if (line.contains("username")) {
-                username = line.split(":")[1];
+                hasAuthorization = true;
+                username = line.split(":")[1].strip();
+                username = username.substring(1, username.length() - 2);
             }
         }
+        return hasAuthorization;
     } // verifyAccess
 
-    private boolean checkForToken() {
-        if (!Files.exists(configPath)) return false;
+    protected boolean checkForToken() {
+        if (!Files.exists(secretsPath)) return false;
         else {
             try {
                 buildToken();
@@ -90,6 +93,7 @@ public class DiscogsAuthorization {
     private void saveToken(String token, String secret) throws IOException {
         Files.createFile(secretsPath);
         Files.writeString(secretsPath,token + "\n" + secret);
+        hasToken = true;
     } // saveToken()
 
     private void buildToken() throws IOException {
@@ -101,8 +105,27 @@ public class DiscogsAuthorization {
         return Files.readAllLines(configPath).toArray(new String[2]);
     } // parseConfig()
 
-    public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
-        DiscogsAuthorization auth = new DiscogsAuthorization();
-    } // main()
+    protected boolean hasAuthorization() {
+        return hasAuthorization;
+    } // isAuthorized()
 
+    protected boolean hasToken() {
+        return hasToken;
+    }
+
+    protected String getUsername() {
+        return username;
+    } // getUsername()
+
+    protected String getAuthUrl(OAuth1RequestToken requestToken) {
+        return service.getAuthorizationUrl(requestToken);
+    } // getAuthUrl()
+
+    protected OAuth10aService getService() {
+        return service;
+    } // getService()
+
+    protected OAuth1AccessToken getAccessToken() {
+        return accessToken;
+    }
 } // DiscogsAuthorization class

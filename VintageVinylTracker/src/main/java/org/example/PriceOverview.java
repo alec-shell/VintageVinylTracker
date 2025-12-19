@@ -12,4 +12,3 @@ public class PriceOverview {
     } // constructor()
 
 } // PriceOverview()
-

@@ -3,16 +3,16 @@ package org.example;
 import com.github.scribejava.core.builder.api.DefaultApi10a;
 import com.github.scribejava.core.model.OAuth1RequestToken;
 
-public class DiscogsAPI extends DefaultApi10a {
+public class ScribeDiscogsAPI extends DefaultApi10a {
 
-    protected DiscogsAPI() {
+    protected ScribeDiscogsAPI() {
     } // constructor
 
     private static class InstanceHolder {
-        private static final DiscogsAPI INSTANCE = new DiscogsAPI();
+        private static final ScribeDiscogsAPI INSTANCE = new ScribeDiscogsAPI();
     } // InstanceHolder class
 
-    public static  DiscogsAPI getInstance() {
+    public static ScribeDiscogsAPI getInstance() {
         return InstanceHolder.INSTANCE;
     } // getInstance()
 
@@ -35,4 +35,4 @@ public class DiscogsAPI extends DefaultApi10a {
     public String getAuthorizationUrl(OAuth1RequestToken requestToken) {
         return String.format(getAuthorizationBaseUrl(), requestToken.getToken());
     }
-}
+} // ScribeDiscogsAPI class

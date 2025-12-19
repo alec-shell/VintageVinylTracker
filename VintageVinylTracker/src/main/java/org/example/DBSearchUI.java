@@ -12,13 +12,13 @@ public class DBSearchUI extends JPanel {
     private final JTextField albumNameJTF = new JTextField();
     private final JTextField artistNameJTF =  new JTextField();
     private final JTextField yearJTF = new JTextField();
-    private final JTextField countryJTF = new JTextField();
+    private final JTextField catNoJTF = new JTextField();
     private JCheckBox ownedSelector = null;
-    private final String[] columnNames = new String[]{"Album", "Band", "Year", "Owned",
-            "Condition", "IsMaster", "ID"};
+    private final String[] columnNames = new String[]{"Catalog No.", "Artist", "Album", "Year", "Country", "Owned",
+            "Condition"};
 
 
-    public DBSearchUI(DBAccess dbAccess) {
+    protected DBSearchUI(DBAccess dbAccess) {
         this.dbAccess = dbAccess;
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         resultsDisplay = new JTable(model);
@@ -28,7 +28,6 @@ public class DBSearchUI extends JPanel {
         this.add(new JScrollPane(resultsDisplay), BorderLayout.CENTER);
     } // constructor
 
-
     private JPanel buildSearchEntryForm() {
         JPanel searchEntryForm = new JPanel();
         searchEntryForm.setBackground(Color.LIGHT_GRAY);
@@ -37,7 +36,7 @@ public class DBSearchUI extends JPanel {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridx = 0;
         int gridyCounter = 0;
-        JLabel searchLabel = new JLabel("Search in local database:");
+        JLabel searchLabel = new JLabel("Search:");
         c.gridy = gridyCounter++;
         searchEntryForm.add(searchLabel, c);
         JPanel artistName = getEntryField("Artist Name: ", artistNameJTF);
@@ -49,9 +48,7 @@ public class DBSearchUI extends JPanel {
         JPanel yearField = getEntryField("Year: ", yearJTF);
         c.gridy = gridyCounter++;
         searchEntryForm.add(yearField, c);
-        JPanel countryField = getEntryField("Country: ", countryJTF);
-        c.gridy = gridyCounter++;
-        searchEntryForm.add(countryField, c);
+        JPanel catalogNo = getEntryField("Catalog No.", catNoJTF);
         ownedSelector = new JCheckBox(" --- Owned?");
         c.gridy = gridyCounter++;
         searchEntryForm.add(ownedSelector, c);
@@ -62,12 +59,12 @@ public class DBSearchUI extends JPanel {
             String artist = !artistNameJTF.getText().isBlank() ? artistNameJTF.getText() : null;
             String album = !albumNameJTF.getText().isBlank() ? albumNameJTF.getText() : null;
             String year = !yearJTF.getText().isBlank() ? yearJTF.getText() : null;
-            Record[] results = queryDB(artist, album, year, ownedSelector.isSelected());
+            String catNo = !catNoJTF.getText().isBlank() ? catNoJTF.getText() : null;
+            Record[] results = queryDB(artist, album, year, catNo, ownedSelector.isSelected());
             updateResultsDisplay(results);
         });
         return searchEntryForm;
     } // buildSearchEntryForm()
-
 
     private JPanel getEntryField(String fieldName, JTextField entryField) {
         JPanel entryPanel = new JPanel();
@@ -80,18 +77,22 @@ public class DBSearchUI extends JPanel {
         return entryPanel;
     } // getEntryField()
 
-
     private void updateResultsDisplay(Record[] rows) {
         DefaultTableModel model = (DefaultTableModel) resultsDisplay.getModel();
         model.setRowCount(0);
         for (Record record : rows) {
-            model.addRow(record.returnValues());
+            model.addRow(new String[]{record.getCatNo(),
+                    record.getArtistName(),
+                    record.getAlbumName(),
+                    record.getYear(),
+                    record.getCountry(),
+                    Boolean.toString(record.isOwned()),
+                    record.getCondition()});
         }
     } // updateResultsDisplay()
 
-
-    private Record[] queryDB(String name, String album, String year, Boolean isOwned) {
-        List<Record> results = dbAccess.searchRecordEntries(name, album, year, isOwned);
+    private Record[] queryDB(String name, String album, String year, String catNo, Boolean isOwned) {
+        List<Record> results = dbAccess.searchRecordEntries(name, album, year, catNo, isOwned);
         Record[] rows = new Record[results.size()];
         for (int i = 0; i < rows.length; i++) {
             rows[i] = results.get(i);

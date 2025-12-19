@@ -1,0 +1,40 @@
+package org.example;
+
+import com.github.scribejava.core.model.OAuthRequest;
+import com.github.scribejava.core.model.Verb;
+
+import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+
+public class DiscogsClient {
+
+    protected static String searchQuery(DiscogsAuthorization auth, String album, String artist, String year, String catNo, int pageNo) throws IOException, ExecutionException, InterruptedException {
+        StringBuilder query = new StringBuilder();
+        query.append("https://api.discogs.com/database/search?format=vinyl&page=");
+        query.append(pageNo);
+        if  (album != null) query.append("&release_title=").append(album);
+        if (artist != null) query.append("&artist=").append(artist);
+        if (year != null) query.append("&year=").append(year);
+        if (catNo != null) query.append("&catno=").append(catNo);
+
+        OAuthRequest request =  new OAuthRequest(Verb.GET, query.toString());
+        auth.getService().signRequest(auth.getAccessToken(), request);
+        return auth.getService().execute(request).getBody();
+    } // searchQuery()
+
+    protected static String getPriceSuggestions(DiscogsAuthorization auth,int id) throws IOException, ExecutionException, InterruptedException {
+        StringBuilder query = new StringBuilder();
+        query.append("https://api.discogs.com/marketplace/price_suggestions/");
+        query.append(id);
+        OAuthRequest request =  new OAuthRequest(Verb.GET, query.toString());
+        auth.getService().signRequest(auth.getAccessToken(), request);
+        return auth.getService().execute(request).getBody();
+    } // getPriceSuggestion()
+
+    public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
+        DiscogsAuthorization auth = new DiscogsAuthorization();
+        System.out.println(auth.verifyAccess());
+        ParseAPIResponse.buildSearchQueryCollection(auth, "Nevermind", "Nirvana", null, null);
+    } // main()
+
+} // DiscogsClient class

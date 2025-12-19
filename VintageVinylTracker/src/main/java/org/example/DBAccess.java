@@ -13,8 +13,7 @@ import java.util.List;
 public class DBAccess {
     private final Connection conn;
 
-
-    public DBAccess() {
+    protected DBAccess() {
         String url =  "jdbc:sqlite:VintageVinyl.db";
         try {
             conn = DriverManager.getConnection(url);
@@ -25,7 +24,6 @@ public class DBAccess {
         }
     } // constructor
 
-
     private void initTables() throws SQLException {
         String createVinylTable = """
                     CREATE TABLE IF NOT EXISTS
@@ -35,7 +33,8 @@ public class DBAccess {
                     year VARCHAR(4) NOT NULL,
                     country VARCHAR(20) NOT NULL,
                     condition VARCHAR(40) NOT NULL,
-                    is_master BOOLEAN NOT NULL,
+                    cat_no VARCHAR(40) NOT NULL,
+                    thumb_url VARCHAR(200),
                     is_owned BOOLEAN NOT NULL)
                     """;
         String createPriceTable = """
@@ -43,7 +42,6 @@ public class DBAccess {
                 Price( id INT PRIMARY KEY,
                 paid REAL,
                 estimated_retail REAL,
-                estimate_date DATE,
                 FOREIGN KEY (id) REFERENCES Vinyl(id)
                 ON DELETE CASCADE
                 ON UPDATE CASCADE)
@@ -51,7 +49,6 @@ public class DBAccess {
         conn.prepareStatement(createVinylTable).execute();
         conn.prepareStatement(createPriceTable).execute();
     } // initTables()
-
 
     public final void closeConnection() {
         try {
@@ -61,9 +58,9 @@ public class DBAccess {
         }
     } // closeConnection()
 
-
-    public final Boolean addRecordEntry(int id, String bandName, String albumName, String year, String country, String condition, boolean isMaster, boolean isOwned) {
-        String entryStmt = "INSERT INTO Vinyl(id, band_name, album_name, year, country, condition, is_master, is_owned) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    public final Boolean addRecordEntry(int id, String bandName, String albumName, String year, String description,
+                                        String country, String condition, String catNo, String thumbUrl, boolean isOwned) {
+        String entryStmt = "INSERT INTO Vinyl(id, band_name, album_name, year, country, condition, cat_no, thumb_url, is_owned) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(entryStmt)) {
             stmt.setInt(1, id);
             stmt.setString(2, bandName);
@@ -71,8 +68,9 @@ public class DBAccess {
             stmt.setString(4, year);
             stmt.setString(5, country);
             stmt.setString(6, condition);
-            stmt.setBoolean(7, isMaster);
-            stmt.setBoolean(8, isOwned);
+            stmt.setString(7, catNo);
+            stmt.setString(8, thumbUrl);
+            stmt.setBoolean(9, isOwned);
             stmt.execute();
             return true;
         } catch (SQLException e) {
@@ -81,10 +79,9 @@ public class DBAccess {
         return false;
     } // addEntry()
 
-
-    public final List<Record> searchRecordEntries(String bandName, String albumName, String year, Boolean isOwned) {
+    public final List<Record> searchRecordEntries(String bandName, String albumName, String year, String catNo, Boolean isOwned) {
         List<Record> resultsList = new ArrayList<>();
-        try(PreparedStatement stmt = buildRecordSearchStmt(bandName, albumName, year, isOwned)) {
+        try(PreparedStatement stmt = buildRecordSearchStmt(bandName, albumName, year, catNo, isOwned)) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Record temp = new Record(rs.getInt("id"),
@@ -93,7 +90,8 @@ public class DBAccess {
                         rs.getString("year"),
                         rs.getString("condition"),
                         rs.getString("country"),
-                        rs.getBoolean("is_master"),
+                        rs.getString("cat_no"),
+                        rs.getString("thumb_url"),
                         rs.getBoolean("is_owned")
                     );
                 resultsList.add(temp);
@@ -104,14 +102,14 @@ public class DBAccess {
         return resultsList;
     } // searchRecordEntries()
 
-
-    private PreparedStatement buildRecordSearchStmt(String bandName, String albumName, String year, Boolean isOwned) throws SQLException {
+    private PreparedStatement buildRecordSearchStmt(String bandName, String albumName, String year, String catNo, Boolean isOwned) throws SQLException {
         // build out search query conditionally
         StringBuilder stmtSB =  new StringBuilder();
         stmtSB.append("SELECT * FROM Vinyl WHERE 1=1");
         if (bandName != null) {stmtSB.append(" AND band_name LIKE ?");}
         if (albumName != null) {stmtSB.append(" AND album_name LIKE ?");}
         if (year != null) {stmtSB.append(" AND year LIKE ?");}
+        if (catNo != null) {stmtSB.append(" AND cat_no LIKE ?");}
         if (isOwned != null) {stmtSB.append(" AND is_owned = ?");}
         // fill out prepared values conditionally
         int paramIndex = 1;
@@ -119,10 +117,10 @@ public class DBAccess {
         if (bandName != null) {ps.setString(paramIndex++, bandName);}
         if (albumName != null) {ps.setString(paramIndex++, albumName);}
         if (year != null) {ps.setString(paramIndex++, year);}
+        if (catNo != null) {ps.setString(paramIndex++, catNo);}
         if (isOwned != null) {ps.setBoolean(paramIndex, isOwned);}
         return ps;
     } // buildRecordSearchStmt()
-
 
     public final void addPriceEntry(int id, double pricePaid, double estimatedRetail) throws SQLException {
         String cmd = "INSERT INTO Price VALUES (?, ?, ?, ?)";
@@ -133,7 +131,6 @@ public class DBAccess {
         ps.setDate(4, new java.sql.Date(new java.util.Date().getTime()));
         ps.execute();
     } // addPriceEntry()
-
 
     public final void updatePriceEntry(int id, Double pricePaid, Double estimatedRetail) throws SQLException {
         StringBuilder sb = new StringBuilder("UPDATE Price SET");
@@ -149,10 +146,9 @@ public class DBAccess {
         ps.execute();
     } // updatePriceEntry()
 
-
     public static void main(String[] args) {
         DBAccess dbAccess = new DBAccess();
-        List<Record> results = dbAccess.searchRecordEntries("America", null, null, null);
+        List<Record> results = dbAccess.searchRecordEntries("America", null, null, null, null);
         for (Record record : results) {
             System.out.println(record);
         }
