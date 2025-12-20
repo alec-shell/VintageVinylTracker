@@ -14,11 +14,10 @@ public class DBSearchUI extends JPanel {
     private final JTextField yearJTF = new JTextField();
     private final JTextField catNoJTF = new JTextField();
     private JCheckBox ownedSelector = null;
-    private final String[] columnNames = new String[]{"Catalog No.", "Artist", "Album", "Year", "Country", "Owned",
-            "Condition"};
+    private final String[] columnNames = new String[]{"Catalog No.", "Artist", "Album", "Year", "Country", "Owned"};
 
 
-    protected DBSearchUI(DBAccess dbAccess) {
+    public DBSearchUI(DBAccess dbAccess) {
         this.dbAccess = dbAccess;
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         resultsDisplay = new JTable(model);
@@ -49,7 +48,9 @@ public class DBSearchUI extends JPanel {
         c.gridy = gridyCounter++;
         searchEntryForm.add(yearField, c);
         JPanel catalogNo = getEntryField("Catalog No.", catNoJTF);
-        ownedSelector = new JCheckBox(" --- Owned?");
+        c.gridy = gridyCounter++;
+        searchEntryForm.add(catalogNo, c);
+        ownedSelector = new JCheckBox(" --- Owned");
         c.gridy = gridyCounter++;
         searchEntryForm.add(ownedSelector, c);
         JButton submit =  new JButton("Search");
@@ -86,8 +87,8 @@ public class DBSearchUI extends JPanel {
                     record.getAlbumName(),
                     record.getYear(),
                     record.getCountry(),
-                    Boolean.toString(record.isOwned()),
-                    record.getCondition()});
+                    Boolean.toString(record.isOwned())
+            });
         }
     } // updateResultsDisplay()
 

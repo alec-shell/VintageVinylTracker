@@ -29,7 +29,7 @@ public class MainUI extends JFrame {
         this.setLayout(new BorderLayout());
         this.dbAccess = new DBAccess();
         this.dbSearchUI = new DBSearchUI(dbAccess);
-        this.discogsUI = new DiscogsUI(discogsAuth);
+        this.discogsUI = new DiscogsUI(discogsAuth, dbAccess);
         buildTabbedPane();
         this.add(tabsPane, BorderLayout.CENTER);
     } // constructor
@@ -81,7 +81,8 @@ public class MainUI extends JFrame {
 
     private void errorOptionPane(String message) {
         JOptionPane.showMessageDialog(this, "Could not connect to Discogs: " + message, "Authorization Error", JOptionPane.ERROR_MESSAGE);
-    }
+    } // errorOptionPane()
+
     public static void main(String[] args) {
         JFrame frame = new MainUI();
         frame.setVisible(true);

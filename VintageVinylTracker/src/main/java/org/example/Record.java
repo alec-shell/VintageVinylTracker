@@ -11,33 +11,32 @@ public class Record {
     private String albumName;
     private String year;
     private String country;
-    private String condition;
     private String catNo;
     private String thumbUrl;
     private boolean isOwned;
+    private Double purchasePrice;
 
-    protected Record(int id,
+    public Record(int id,
                      String bandName,
                      String albumName,
                      String year,
                      String country,
-                     String condition,
                      String catNo,
                      String thumbUrl,
-                     boolean isOwned) {
+                     boolean isOwned,
+                  Double purchasePrice) {
         this.id = id;
         this.artistName = bandName;
         this.albumName = albumName;
         this.year = year;
         this.country = country;
-        this.condition = condition;
         this.catNo = catNo;
         this.thumbUrl = thumbUrl;
         this.isOwned = isOwned;
+        this.purchasePrice = purchasePrice;
     } // constructor
 
     // getters
-
     public final int getID() {
         return id;
     } // getID()
@@ -58,10 +57,6 @@ public class Record {
         return country;
     } // getCountry()
 
-    public final String getCondition() {
-        return condition;
-    } // getCondition()
-
     public final String getCatNo() {
         return catNo;
     } // getCatNo()
@@ -74,8 +69,11 @@ public class Record {
         return isOwned;
     } // isOwned()
 
-    // setters
+    public final Double getPurchasePrice() {
+        return purchasePrice;
+    } // getPurchasePrice()
 
+    // setters
     public final void setID(int id) {
         this.id = id;
     } // setID()
@@ -96,10 +94,6 @@ public class Record {
         this.country = country;
     } // setCountry()
 
-    public final void setCondition(String condition) {
-
-    } // setCondition()
-
     public final void setCatNo(String catNo) {
         this.catNo = catNo;
     } // setCatNo()
@@ -112,9 +106,8 @@ public class Record {
         this.isOwned = isOwned;
     } // setIsOwned()
 
-    @Override
-    public String toString() {
-        return Integer.toString(this.id) + " " + artistName + " " +  albumName + " " + year + " " +  country + " " +  condition + " " +  catNo;
-    }
+    public final void setPurchasePrice(Double purchasePrice) {
+        this.purchasePrice = purchasePrice;
+    } // setPurchasePrice()
 
 } // Record class

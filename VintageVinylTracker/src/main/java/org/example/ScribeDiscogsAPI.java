@@ -5,7 +5,7 @@ import com.github.scribejava.core.model.OAuth1RequestToken;
 
 public class ScribeDiscogsAPI extends DefaultApi10a {
 
-    protected ScribeDiscogsAPI() {
+    public ScribeDiscogsAPI() {
     } // constructor
 
     private static class InstanceHolder {
