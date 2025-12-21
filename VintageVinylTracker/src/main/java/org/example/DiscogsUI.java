@@ -1,14 +1,11 @@
 package org.example;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 
 public class DiscogsUI extends JPanel {
@@ -17,14 +14,15 @@ public class DiscogsUI extends JPanel {
     private final JTextField albumNameJTF =  new JTextField();
     private final JTextField yearJTF = new JTextField();
     private final JTextField catNoJTF =  new JTextField();
-    private final String[] columnNames = {"Catalog No.", "Artist", "Album", "Year", "Country"};
-    private final int albumArtWidth = 180;
-    private final int albumArtHeight = 180;
-    private final Image scaledDefaultThumbNail = new ImageIcon("VintageVinylTracker/img/defaultThumbnail.jpg")
-            .getImage().getScaledInstance(albumArtWidth, albumArtHeight, Image.SCALE_SMOOTH);
-    private final ImageIcon defaultThumbNail = new ImageIcon(scaledDefaultThumbNail);
+    private final String[] columnNames = {
+            "Catalog No.",
+            "Artist",
+            "Album",
+            "Year",
+            "Country"
+    };
     private JLabel albumArtLabel;
-    private final Label pricingInfoLabel = new Label();
+    private final JLabel pricingInfoLabel = new JLabel();
     private final DiscogsAuthorization discogsAuth;
     private final DBAccess dbAccess;
     private ArrayList<Record> records;
@@ -47,8 +45,8 @@ public class DiscogsUI extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 int rowIndex = discogsTable.getSelectedRow();
                 if (records == null || records.size() <= rowIndex) { return; }
-                asyncThumbnailCall(records.get(rowIndex).getThumbUrl());
-                asyncPricingCall(records.get(rowIndex).getID());
+                AsyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel);
+                AsyncCalls.asyncPricingCall(records.get(rowIndex).getID(), pricingInfoLabel, discogsAuth);
             }
             @Override
             public void mousePressed(MouseEvent e) {}
@@ -113,27 +111,27 @@ public class DiscogsUI extends JPanel {
     } // addOwnedAlbum()
 
     private void sendAlbumToDB(Record selected) {
-        try {
-            dbAccess.addRecordEntry(
-                    selected.getID(),
-                    selected.getArtistName(),
-                    selected.getAlbumName(),
-                    selected.getYear(),
-                    selected.getCountry(),
-                    selected.getCatNo(),
-                    selected.getThumbUrl(),
-                    selected.isOwned(),
-                    selected.getPurchasePrice());
-        } catch (Exception e){
+        boolean added = dbAccess.addRecordEntry(
+                selected.getID(),
+                selected.getArtistName(),
+                selected.getAlbumName(),
+                selected.getYear(),
+                selected.getCountry(),
+                selected.getCatNo(),
+                selected.getThumbUrl(),
+                selected.isOwned(),
+                selected.getPurchasePrice());
+        if (!added) {
             JOptionPane.showMessageDialog(this,
                     "Failed to add record to database.",
                     "Error",
-                    JOptionPane.OK_OPTION);
+                JOptionPane.ERROR_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this,
+                    "Record added to database",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
         }
-        JOptionPane.showMessageDialog(this,
-                "Record added to database",
-                "Success",
-                JOptionPane.OK_OPTION);
     } // sendAlbumToDB()
 
     private JPanel buildAlbumInfoDisplay() {
@@ -145,15 +143,15 @@ public class DiscogsUI extends JPanel {
         c.insets = new Insets(5, 5, 5, 5);
         int gridxCounter = 0;
         c.gridy = 0;
-        albumArtLabel = new JLabel(defaultThumbNail);
-        albumArtLabel.setPreferredSize(new Dimension(albumArtWidth, albumArtHeight));
+        albumArtLabel = new JLabel(AsyncCalls.defaultThumbNail);
+        albumArtLabel.setPreferredSize(new Dimension(AsyncCalls.albumArtWidth, AsyncCalls.albumArtHeight));
         c.gridx = gridxCounter++;
         albumInfoPanel.add(albumArtLabel, c);
         c.gridx = gridxCounter;
         pricingInfoLabel.setPreferredSize(new Dimension(300, 180));
         albumInfoPanel.add(pricingInfoLabel, c);
         return albumInfoPanel;
-    } // build albumInfoDisplay()
+    } // buildAlbumInfoDisplay()
 
     private JPanel buildSearchEntryForm() {
         JPanel searchEntryForm = new JPanel();
@@ -190,7 +188,7 @@ public class DiscogsUI extends JPanel {
         String album = !albumNameJTF.getText().isBlank() ? albumNameJTF.getText() : null;
         String year = !yearJTF.getText().isBlank() ? yearJTF.getText() : null;
         String catNo = !catNoJTF.getText().isBlank() ? catNoJTF.getText() : null;
-        albumArtLabel.setIcon(defaultThumbNail);
+        albumArtLabel.setIcon(AsyncCalls.defaultThumbNail);
         pricingInfoLabel.setText("");
         asyncSearchQueryCall(album, artist, year, catNo);
     } // searchDiscogs()
@@ -234,46 +232,5 @@ public class DiscogsUI extends JPanel {
         };
         worker.execute();
     } // asyncSearchQueryCall()
-
-    private void asyncPricingCall(int id) {
-        SwingWorker<String, Void> worker = new SwingWorker<>() {
-
-            @Override
-            protected String doInBackground() {
-                 return ParseAPIResponse.buildPricingQueryCollection(discogsAuth, id);
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    pricingInfoLabel.setText(this.get().toString());
-                } catch (InterruptedException | ExecutionException e) {
-                    pricingInfoLabel.setText("Unavailable");
-                }
-            }
-        };
-        worker.execute();
-    } // asyncPricingCall()
-
-    private void asyncThumbnailCall(String thumbUrl) {
-        SwingWorker<ImageIcon, Void> worker = new SwingWorker<>() {
-            @Override
-            protected ImageIcon doInBackground() throws Exception {
-                Image newImg = ImageIO.read(new URL(thumbUrl))
-                        .getScaledInstance(albumArtWidth, albumArtHeight, Image.SCALE_DEFAULT);
-                return new ImageIcon(newImg);
-            } // doInBackground()
-
-            @Override
-            protected void done() {
-                try {
-                    albumArtLabel.setIcon((ImageIcon) get());
-                } catch (InterruptedException | ExecutionException e) {
-                    albumArtLabel.setIcon(defaultThumbNail);
-                }
-            } // done()
-        };
-        worker.execute();
-    } // asyncThumbnailCall()
 
 } // DiscogsUI class

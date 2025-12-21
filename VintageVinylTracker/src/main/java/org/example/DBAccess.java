@@ -8,7 +8,6 @@ package org.example;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.List;
 
 public class DBAccess {
     private final Connection conn;
@@ -40,14 +39,6 @@ public class DBAccess {
         conn.prepareStatement(createVinylTable).execute();
     } // initTables()
 
-    public final void closeConnection() {
-        try {
-            conn.close();
-        } catch (SQLException e) {
-            System.out.println("Database connection failed... " + e.getMessage());
-        }
-    } // closeConnection()
-
     public final Boolean addRecordEntry(int id, String bandName, String albumName, String year,
                                         String country, String catNo, String thumbUrl, boolean isOwned, double purchasePrice) {
         String entryStmt = "INSERT INTO Vinyl(id, band_name, album_name, year, country, cat_no, thumb_url, is_owned, purchase_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -65,12 +56,12 @@ public class DBAccess {
             return true;
         } catch (SQLException e) {
             System.out.println("SQL Exception... " + e.getMessage());
+            return false;
         }
-        return false;
     } // addEntry()
 
-    public final List<Record> searchRecordEntries(String bandName, String albumName, String year, String catNo, Boolean isOwned) {
-        List<Record> resultsList = new ArrayList<>();
+    public final ArrayList<Record> searchRecordEntries(String bandName, String albumName, String year, String catNo, Boolean isOwned) {
+        ArrayList<Record> resultsList = new ArrayList<>();
         try(PreparedStatement stmt = buildRecordSearchStmt(bandName, albumName, year, catNo, isOwned)) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -91,6 +82,19 @@ public class DBAccess {
         }
         return resultsList;
     } // searchRecordEntries()
+
+    public boolean deleteRecordEntry(int id) {
+        try {
+            String deleteStmt = "DELETE FROM Vinyl WHERE id = ?";
+            PreparedStatement stmt = conn.prepareStatement(deleteStmt);
+            stmt.setInt(1, id);
+            stmt.execute();
+            return true;
+        } catch (SQLException e) {
+            System.out.println("SQL Exception... " + e.getMessage());
+            return false;
+        }
+    } // deleteRecordEntry()
 
     private PreparedStatement buildRecordSearchStmt(String bandName, String albumName, String year, String catNo, Boolean isOwned) throws SQLException {
         // build out search query conditionally

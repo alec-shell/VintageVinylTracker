@@ -19,7 +19,7 @@ public class MainUI extends JFrame {
     private JTabbedPane tabsPane;
     private final DBSearchUI dbSearchUI;
     private final DiscogsUI discogsUI;
-    private DiscogsAuthorization discogsAuth;
+    private final DiscogsAuthorization discogsAuth;
 
     public MainUI() {
         this.setTitle("Vintage Vinyl");
@@ -28,7 +28,7 @@ public class MainUI extends JFrame {
         this.discogsAuth = new DiscogsAuthorization();
         this.setLayout(new BorderLayout());
         this.dbAccess = new DBAccess();
-        this.dbSearchUI = new DBSearchUI(dbAccess);
+        this.dbSearchUI = new DBSearchUI(discogsAuth, dbAccess);
         this.discogsUI = new DiscogsUI(discogsAuth, dbAccess);
         buildTabbedPane();
         this.add(tabsPane, BorderLayout.CENTER);
@@ -42,7 +42,7 @@ public class MainUI extends JFrame {
     } // buildTabbedPane()
 
     private void addTabListener() {
-        tabsPane.addChangeListener(e -> {
+        tabsPane.addChangeListener(_ -> {
             String tabTitle = tabsPane.getTitleAt(tabsPane.getSelectedIndex());
             if (tabTitle.equals("Discogs")) {
                 if (!discogsAuth.hasToken()) {

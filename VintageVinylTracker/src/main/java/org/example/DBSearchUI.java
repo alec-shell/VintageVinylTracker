@@ -3,29 +3,113 @@ package org.example;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.List;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.ArrayList;
 
 
 public class DBSearchUI extends JPanel {
-    private final JTable resultsDisplay;
+    private final JTable dbTable;
     private final DBAccess dbAccess;
     private final JTextField albumNameJTF = new JTextField();
     private final JTextField artistNameJTF =  new JTextField();
     private final JTextField yearJTF = new JTextField();
     private final JTextField catNoJTF = new JTextField();
     private JCheckBox ownedSelector = null;
-    private final String[] columnNames = new String[]{"Catalog No.", "Artist", "Album", "Year", "Country", "Owned"};
+    private final String[] columnNames = new String[]{
+            "Catalog No.",
+            "Artist",
+            "Album",
+            "Year",
+            "Country",
+            "Owned"
+    };
+    private ArrayList<Record> records;
+    private JLabel albumArtLabel;
+    private final JLabel pricingInfoLabel = new JLabel();
+    private final DiscogsAuthorization discogsAuth;
 
-
-    public DBSearchUI(DBAccess dbAccess) {
+    public DBSearchUI( DiscogsAuthorization discogsAuth, DBAccess dbAccess) {
         this.dbAccess = dbAccess;
+        this.discogsAuth = discogsAuth;
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
-        resultsDisplay = new JTable(model);
+        dbTable = new JTable(model);
+        addTableListener();
         this.setBackground(Color.LIGHT_GRAY);
         this.setLayout(new BorderLayout());
-        this.add(buildSearchEntryForm(), BorderLayout.NORTH);
-        this.add(new JScrollPane(resultsDisplay), BorderLayout.CENTER);
+        this.add(buildUIPanel(), BorderLayout.NORTH);
+        this.add(new JScrollPane(dbTable), BorderLayout.CENTER);
     } // constructor
+
+    private void addTableListener() {
+        dbTable.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int rowIndex = dbTable.getSelectedRow();
+                if (records == null || records.size() <= rowIndex) { return; }
+                AsyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel);
+                AsyncCalls.asyncPricingCall(records.get(rowIndex).getID(), pricingInfoLabel, discogsAuth);
+            }
+            @Override
+            public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
+        });
+    } // addTableListener()
+
+    private JPanel buildUIPanel() {
+        JPanel temp = new JPanel(new  GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        temp.setBackground(Color.LIGHT_GRAY);
+        temp.add(buildAlbumInfoDisplay(), c);
+        c.gridx = 1;
+        temp.add(buildSearchEntryForm(), c);
+        c.gridx = 0;
+        c.gridy = 1;
+        JButton addBtn = new JButton("Remove Album");
+        addBtn.addActionListener(_ -> removeAlbumListener());
+        temp.add(addBtn, c);
+        return temp;
+    } // buildUIPanel()
+
+    private void removeAlbumListener() {
+        int selectedIndex = dbTable.getSelectedRow();
+        if (records == null || records.size() <= selectedIndex) { return; }
+        boolean deleted = dbAccess.deleteRecordEntry(records.get(selectedIndex).getID());
+        if (deleted) {
+            records.remove(selectedIndex);
+            updateResultsDisplay(records);
+        } else {
+            JOptionPane.showMessageDialog(this, "Album could not be deleted",
+                    "Error",
+                    JOptionPane.OK_OPTION);
+        }
+    } // removeAlbumListener()
+
+    private JPanel buildAlbumInfoDisplay() {
+        JPanel albumInfoPanel = new JPanel();
+        albumInfoPanel.setBackground(Color.LIGHT_GRAY);
+        albumInfoPanel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.insets = new Insets(5, 5, 5, 5);
+        int gridxCounter = 0;
+        c.gridy = 0;
+        albumArtLabel = new JLabel(AsyncCalls.defaultThumbNail);
+        albumArtLabel.setPreferredSize(new Dimension(AsyncCalls.albumArtWidth, AsyncCalls.albumArtHeight));
+        c.gridx = gridxCounter++;
+        albumInfoPanel.add(albumArtLabel, c);
+        c.gridx = gridxCounter;
+        pricingInfoLabel.setPreferredSize(new Dimension(300, 180));
+        albumInfoPanel.add(pricingInfoLabel, c);
+        return albumInfoPanel;
+    } // build albumInfoDisplay()
 
     private JPanel buildSearchEntryForm() {
         JPanel searchEntryForm = new JPanel();
@@ -56,16 +140,18 @@ public class DBSearchUI extends JPanel {
         JButton submit =  new JButton("Search");
         c.gridy = gridyCounter;
         searchEntryForm.add(submit, c);
-        submit.addActionListener(_ -> {
-            String artist = !artistNameJTF.getText().isBlank() ? artistNameJTF.getText() : null;
-            String album = !albumNameJTF.getText().isBlank() ? albumNameJTF.getText() : null;
-            String year = !yearJTF.getText().isBlank() ? yearJTF.getText() : null;
-            String catNo = !catNoJTF.getText().isBlank() ? catNoJTF.getText() : null;
-            Record[] results = queryDB(artist, album, year, catNo, ownedSelector.isSelected());
-            updateResultsDisplay(results);
-        });
+        submit.addActionListener(_ -> submitActionListener());
         return searchEntryForm;
     } // buildSearchEntryForm()
+
+    private void submitActionListener() {
+        String artist = !artistNameJTF.getText().isBlank() ? artistNameJTF.getText() : null;
+        String album = !albumNameJTF.getText().isBlank() ? albumNameJTF.getText() : null;
+        String year = !yearJTF.getText().isBlank() ? yearJTF.getText() : null;
+        String catNo = !catNoJTF.getText().isBlank() ? catNoJTF.getText() : null;
+        records = dbAccess.searchRecordEntries(artist, album, year, catNo, ownedSelector.isSelected());
+        updateResultsDisplay(records);
+    } // submitActionListener()
 
     private JPanel getEntryField(String fieldName, JTextField entryField) {
         JPanel entryPanel = new JPanel();
@@ -78,8 +164,8 @@ public class DBSearchUI extends JPanel {
         return entryPanel;
     } // getEntryField()
 
-    private void updateResultsDisplay(Record[] rows) {
-        DefaultTableModel model = (DefaultTableModel) resultsDisplay.getModel();
+    private void updateResultsDisplay(ArrayList<Record> rows) {
+        DefaultTableModel model = (DefaultTableModel) dbTable.getModel();
         model.setRowCount(0);
         for (Record record : rows) {
             model.addRow(new String[]{record.getCatNo(),
@@ -91,14 +177,5 @@ public class DBSearchUI extends JPanel {
             });
         }
     } // updateResultsDisplay()
-
-    private Record[] queryDB(String name, String album, String year, String catNo, Boolean isOwned) {
-        List<Record> results = dbAccess.searchRecordEntries(name, album, year, catNo, isOwned);
-        Record[] rows = new Record[results.size()];
-        for (int i = 0; i < rows.length; i++) {
-            rows[i] = results.get(i);
-        }
-        return rows;
-    } // queryDB()
 
 } // DBSearchTabUI class
