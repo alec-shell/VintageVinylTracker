@@ -34,14 +34,17 @@ public class DBAccess {
                     cat_no VARCHAR(40) NOT NULL,
                     thumb_url VARCHAR(200) NOT NULL,
                     is_owned BOOLEAN NOT NULL,
-                    purchase_price REAL NOT NULL)
+                    purchase_price REAL NOT NULL,
+                    value REAL NOT NULL,
+                    condition VARCHAR(40) NOT NULL)
                     """;
         conn.prepareStatement(createVinylTable).execute();
     } // initTables()
 
     public final Boolean addRecordEntry(int id, String bandName, String albumName, String year,
-                                        String country, String catNo, String thumbUrl, boolean isOwned, double purchasePrice) {
-        String entryStmt = "INSERT INTO Vinyl(id, band_name, album_name, year, country, cat_no, thumb_url, is_owned, purchase_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                                        String country, String catNo, String thumbUrl, boolean isOwned, double purchasePrice,
+                                        double value, String condition) {
+        String entryStmt = "INSERT INTO Vinyl(id, band_name, album_name, year, country, cat_no, thumb_url, is_owned, purchase_price, value, condition) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(entryStmt)) {
             stmt.setInt(1, id);
             stmt.setString(2, bandName);
@@ -52,6 +55,8 @@ public class DBAccess {
             stmt.setString(7, thumbUrl);
             stmt.setBoolean(8, isOwned);
             stmt.setDouble(9, purchasePrice);
+            stmt.setDouble(10, value);
+            stmt.setString(11, condition);
             stmt.execute();
             return true;
         } catch (SQLException e) {
@@ -73,7 +78,9 @@ public class DBAccess {
                         rs.getString("cat_no"),
                         rs.getString("thumb_url"),
                         rs.getBoolean("is_owned"),
-                        rs.getDouble("purchase_price")
+                        rs.getDouble("purchase_price"),
+                        rs.getDouble("value"),
+                        rs.getString("condition")
                     );
                 resultsList.add(temp);
             }

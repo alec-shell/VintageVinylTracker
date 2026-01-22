@@ -26,8 +26,18 @@ public class DiscogsUI extends JPanel {
     private final DiscogsAuthorization discogsAuth;
     private final DBAccess dbAccess;
     private ArrayList<Record> records;
+    private String[] conditions = new String[]{
+            "Mint (M)",
+            "Near Mint (NM or M-)",
+            "Very Good Plus (VG+)",
+            "Very Good (VG)",
+            "Good Plus (G+)",
+            "Good (G)",
+            "Fair (F)",
+            "Poor (P)"
+    };
 
-    protected DiscogsUI(DiscogsAuthorization discogsAuth, DBAccess dbAccess) {
+    public DiscogsUI(DiscogsAuthorization discogsAuth, DBAccess dbAccess) {
         this.discogsAuth = discogsAuth;
         this.dbAccess = dbAccess;
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
@@ -107,6 +117,16 @@ public class DiscogsUI extends JPanel {
             }
         }
         selected.setPurchasePrice(price);
+        selected.setCondition(
+                (String) JOptionPane.showInputDialog(this,
+                        "Select Album Condition:",
+                        "Condition",
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        conditions,
+                        conditions[0]
+                )
+        );
         sendAlbumToDB(selected);
     } // addOwnedAlbum()
 
@@ -120,7 +140,10 @@ public class DiscogsUI extends JPanel {
                 selected.getCatNo(),
                 selected.getThumbUrl(),
                 selected.isOwned(),
-                selected.getPurchasePrice());
+                selected.getPurchasePrice(),
+                selected.getValue(),
+                selected.getCondition()
+        );
         if (!added) {
             JOptionPane.showMessageDialog(this,
                     "Failed to add record to database.",

@@ -54,4 +54,4 @@ public class AsyncCalls {
         worker.execute();
     } // asyncThumbnailCall()
 
-}
+} // AsyncCalls class

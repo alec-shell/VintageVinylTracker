@@ -15,6 +15,8 @@ public class Record {
     private String thumbUrl;
     private boolean isOwned;
     private Double purchasePrice;
+    private Double value;
+    private String condition;
 
     public Record(int id,
                      String bandName,
@@ -24,7 +26,9 @@ public class Record {
                      String catNo,
                      String thumbUrl,
                      boolean isOwned,
-                  Double purchasePrice) {
+                  Double purchasePrice,
+                  Double value,
+                  String condition) {
         this.id = id;
         this.artistName = bandName;
         this.albumName = albumName;
@@ -34,6 +38,8 @@ public class Record {
         this.thumbUrl = thumbUrl;
         this.isOwned = isOwned;
         this.purchasePrice = purchasePrice;
+        this.value = value;
+        this.condition = condition;
     } // constructor
 
     // getters
@@ -73,6 +79,10 @@ public class Record {
         return purchasePrice;
     } // getPurchasePrice()
 
+    public final double getValue() { return value; }
+
+    public final String getCondition() { return  condition; } // getCondition()
+
     // setters
     public final void setID(int id) {
         this.id = id;
@@ -106,8 +116,10 @@ public class Record {
         this.isOwned = isOwned;
     } // setIsOwned()
 
-    public final void setPurchasePrice(Double purchasePrice) {
-        this.purchasePrice = purchasePrice;
-    } // setPurchasePrice()
+    public final void setPurchasePrice(Double purchasePrice) { this.purchasePrice = purchasePrice; } // setPurchasePrice()
+
+    public final void setValue(Double value) { this.value = value; } // setValue()
+
+    public final void setCondition(String condition) { this.condition = condition; } // setCondition()
 
 } // Record class

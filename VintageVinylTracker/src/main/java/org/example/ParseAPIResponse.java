@@ -51,7 +51,9 @@ public class ParseAPIResponse {
                 catNo,
                 thumbUrl,
                 false,
-                0.0);
+                0.0,
+                0.0,
+                "NONE");
     } // convertNodeToRecord()
 
     public static String buildPricingQueryCollection(DiscogsAuthorization auth, int id) {

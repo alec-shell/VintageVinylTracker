@@ -22,7 +22,8 @@ public class DBSearchUI extends JPanel {
             "Album",
             "Year",
             "Country",
-            "Owned"
+            "Owned",
+            "Condition"
     };
     private ArrayList<Record> records;
     private JLabel albumArtLabel;
@@ -173,7 +174,8 @@ public class DBSearchUI extends JPanel {
                     record.getAlbumName(),
                     record.getYear(),
                     record.getCountry(),
-                    Boolean.toString(record.isOwned())
+                    Boolean.toString(record.isOwned()),
+                    record.getCondition()
             });
         }
     } // updateResultsDisplay()
