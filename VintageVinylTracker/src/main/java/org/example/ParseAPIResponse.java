@@ -10,6 +10,19 @@ import java.util.concurrent.ExecutionException;
 
 public class ParseAPIResponse {
 
+    public static String[] conditions = new String[] {
+            "Mint (M)",
+            "Near Mint (NM or M-)",
+            "Very Good Plus (VG+)",
+            "Very Good (VG)",
+            "Good Plus (G+)",
+            "Good (G)",
+            "Fair (F)",
+            "Poor (P)"
+    };
+
+    public static double[] selectionPrices = new double[8];
+
     public static ArrayList<Record> buildSearchQueryCollection(DiscogsAuthorization auth, String album, String artist, String year, String catNo) {
         ObjectMapper mapper = new ObjectMapper();
         ArrayList<Record> records = new ArrayList<>();
@@ -76,20 +89,11 @@ public class ParseAPIResponse {
         return returnString.toString();
     } // buildPricingQueryCollection()
 
-    private static void addConditionalPrices(JsonNode jsonNode, ArrayList<String> pricingByCondition) {
-        String[] conditions = new String[]{
-                "Mint (M)",
-                "Near Mint (NM or M-)",
-                "Very Good Plus (VG+)",
-                "Very Good (VG)",
-                "Good Plus (G+)",
-                "Good (G)",
-                "Fair (F)",
-                "Poor (P)"
-        };
-        for (String condition: conditions) {
-            String price = jsonNode.path(condition).path("value").asText();
-            pricingByCondition.add(condition + ": $" + String.format("%.2f", Double.parseDouble(price)));
+    private static void addConditionalPrices(JsonNode jsonNode,  ArrayList<String> pricingByCondition) {
+        for (int i = 0; i < conditions.length; i++) {
+            Double price = Double.parseDouble(jsonNode.path(conditions[i]).path("value").asText());
+            selectionPrices[i] = price;
+            pricingByCondition.add(conditions[i] + ": $" + String.format("%.2f", price));
         }
     } // addConditionalPrices()
 

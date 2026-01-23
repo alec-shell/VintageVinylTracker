@@ -26,16 +26,6 @@ public class DiscogsUI extends JPanel {
     private final DiscogsAuthorization discogsAuth;
     private final DBAccess dbAccess;
     private ArrayList<Record> records;
-    private String[] conditions = new String[]{
-            "Mint (M)",
-            "Near Mint (NM or M-)",
-            "Very Good Plus (VG+)",
-            "Very Good (VG)",
-            "Good Plus (G+)",
-            "Good (G)",
-            "Fair (F)",
-            "Poor (P)"
-    };
 
     public DiscogsUI(DiscogsAuthorization discogsAuth, DBAccess dbAccess) {
         this.discogsAuth = discogsAuth;
@@ -117,16 +107,21 @@ public class DiscogsUI extends JPanel {
             }
         }
         selected.setPurchasePrice(price);
-        selected.setCondition(
-                (String) JOptionPane.showInputDialog(this,
+
+        String condition = (String) JOptionPane.showInputDialog(this,
                         "Select Album Condition:",
                         "Condition",
                         JOptionPane.QUESTION_MESSAGE,
                         null,
-                        conditions,
-                        conditions[0]
-                )
+                        ParseAPIResponse.conditions,
+                        ParseAPIResponse.conditions[0]
         );
+        selected.setCondition(condition);
+        for (int i = 0; i < ParseAPIResponse.conditions.length; i++) {
+            if (condition.equals(ParseAPIResponse.conditions[i])) {
+                selected.setValue(ParseAPIResponse.selectionPrices[i]);
+            }
+        }
         sendAlbumToDB(selected);
     } // addOwnedAlbum()
 
