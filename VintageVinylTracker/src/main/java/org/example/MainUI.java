@@ -19,25 +19,30 @@ public class MainUI extends JFrame {
     private JTabbedPane tabsPane;
     private final DBSearchUI dbSearchUI;
     private final DiscogsUI discogsUI;
+    private final StatsUI statsUI;
     private final DiscogsAuthorization discogsAuth;
+    private final GenerateStats collectionStats;
 
     public MainUI() {
         this.setTitle("Vintage Vinyl");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(1000, 600);
-        this.discogsAuth = new DiscogsAuthorization();
         this.setLayout(new BorderLayout());
+        this.discogsAuth = new DiscogsAuthorization();
         this.dbAccess = new DBAccess();
-        this.dbSearchUI = new DBSearchUI(discogsAuth, dbAccess);
-        this.discogsUI = new DiscogsUI(discogsAuth, dbAccess);
+        this.collectionStats = new GenerateStats(discogsAuth, dbAccess);
+        this.dbSearchUI = new DBSearchUI(discogsAuth, dbAccess, collectionStats);
+        this.discogsUI = new DiscogsUI(discogsAuth, dbAccess, collectionStats);
+        this.statsUI = new StatsUI(collectionStats);
         buildTabbedPane();
         this.add(tabsPane, BorderLayout.CENTER);
     } // constructor
 
     private void buildTabbedPane() {
         tabsPane = new JTabbedPane(JTabbedPane.LEFT);
-        tabsPane.add("Search Database",  dbSearchUI);
         tabsPane.add("Discogs", discogsUI);
+        tabsPane.add("Search Database",  dbSearchUI);
+        tabsPane.add("Stats", statsUI);
         addTabListener();
     } // buildTabbedPane()
 

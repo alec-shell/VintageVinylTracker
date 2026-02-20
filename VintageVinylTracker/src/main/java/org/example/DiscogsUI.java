@@ -25,11 +25,13 @@ public class DiscogsUI extends JPanel {
     private final JLabel pricingInfoLabel = new JLabel();
     private final DiscogsAuthorization discogsAuth;
     private final DBAccess dbAccess;
+    private final GenerateStats collectionStats;
     private ArrayList<Record> records;
 
-    public DiscogsUI(DiscogsAuthorization discogsAuth, DBAccess dbAccess) {
+    public DiscogsUI(DiscogsAuthorization discogsAuth, DBAccess dbAccess, GenerateStats collectionStats) {
         this.discogsAuth = discogsAuth;
         this.dbAccess = dbAccess;
+        this.collectionStats = collectionStats;
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         this.setLayout(new BorderLayout());
         JPanel UIPanel = buildUIPanel();
@@ -149,6 +151,7 @@ public class DiscogsUI extends JPanel {
                     "Record added to database",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
+            collectionStats.parseOwnedAlbums();
         }
     } // sendAlbumToDB()
 

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 public class DBSearchUI extends JPanel {
     private final JTable dbTable;
     private final DBAccess dbAccess;
+    private final GenerateStats collectionStats;
     private final JTextField albumNameJTF = new JTextField();
     private final JTextField artistNameJTF =  new JTextField();
     private final JTextField yearJTF = new JTextField();
@@ -30,9 +31,10 @@ public class DBSearchUI extends JPanel {
     private final JLabel pricingInfoLabel = new JLabel();
     private final DiscogsAuthorization discogsAuth;
 
-    public DBSearchUI( DiscogsAuthorization discogsAuth, DBAccess dbAccess) {
+    public DBSearchUI( DiscogsAuthorization discogsAuth, DBAccess dbAccess, GenerateStats collectionStats) {
         this.dbAccess = dbAccess;
         this.discogsAuth = discogsAuth;
+        this.collectionStats = collectionStats;
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         dbTable = new JTable(model);
         addTableListener();
@@ -86,6 +88,7 @@ public class DBSearchUI extends JPanel {
         if (deleted) {
             records.remove(selectedIndex);
             updateResultsDisplay(records);
+            collectionStats.parseOwnedAlbums();
         } else {
             JOptionPane.showMessageDialog(this, "Album could not be deleted",
                     "Error",
