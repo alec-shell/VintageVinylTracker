@@ -20,6 +20,7 @@ public class GenerateStats {
     } // constructor
 
     public void parseOwnedAlbums() {
+        resetValues();
         ownedRecords = dbAccess.searchRecordEntries(null,
                 null, null, null, true);
         albumCount = ownedRecords.size();
@@ -35,6 +36,15 @@ public class GenerateStats {
             else if(leastValuableRecord.getValue() > record.getValue()) leastValuableRecord = record;
         }
     } // retrieveOwnedAlbums()
+
+    private void resetValues() {
+        albumCount = 0;
+        totalInvested = 0;
+        totalValue = 0;
+        mostValuableRecord = null;
+        leastValuableRecord = null;
+
+    }
 
     // getters
     public int getOwnedCount() {

@@ -1,5 +1,7 @@
 package org.example;
 
+import jdk.jfr.Event;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -26,12 +28,14 @@ public class DiscogsUI extends JPanel {
     private final DiscogsAuthorization discogsAuth;
     private final DBAccess dbAccess;
     private final GenerateStats collectionStats;
+    private final EventTriggers eventTriggers;
     private ArrayList<Record> records;
 
-    public DiscogsUI(DiscogsAuthorization discogsAuth, DBAccess dbAccess, GenerateStats collectionStats) {
+    public DiscogsUI(DiscogsAuthorization discogsAuth, DBAccess dbAccess, GenerateStats collectionStats, EventTriggers eventTriggers) {
         this.discogsAuth = discogsAuth;
         this.dbAccess = dbAccess;
         this.collectionStats = collectionStats;
+        this.eventTriggers = eventTriggers;
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         this.setLayout(new BorderLayout());
         JPanel UIPanel = buildUIPanel();
@@ -152,6 +156,7 @@ public class DiscogsUI extends JPanel {
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
             collectionStats.parseOwnedAlbums();
+            eventTriggers.updateStatsUI();
         }
     } // sendAlbumToDB()
 

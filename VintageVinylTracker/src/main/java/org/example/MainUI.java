@@ -22,6 +22,7 @@ public class MainUI extends JFrame {
     private final StatsUI statsUI;
     private final DiscogsAuthorization discogsAuth;
     private final GenerateStats collectionStats;
+    private final EventTriggers eventTriggers;
 
     public MainUI() {
         this.setTitle("Vintage Vinyl");
@@ -31,18 +32,19 @@ public class MainUI extends JFrame {
         this.discogsAuth = new DiscogsAuthorization();
         this.dbAccess = new DBAccess();
         this.collectionStats = new GenerateStats(discogsAuth, dbAccess);
-        this.dbSearchUI = new DBSearchUI(discogsAuth, dbAccess, collectionStats);
-        this.discogsUI = new DiscogsUI(discogsAuth, dbAccess, collectionStats);
         this.statsUI = new StatsUI(collectionStats);
+        this.eventTriggers = new EventTriggers(statsUI);
+        this.dbSearchUI = new DBSearchUI(discogsAuth, dbAccess, collectionStats,  eventTriggers);
+        this.discogsUI = new DiscogsUI(discogsAuth, dbAccess, collectionStats, eventTriggers);
         buildTabbedPane();
         this.add(tabsPane, BorderLayout.CENTER);
     } // constructor
 
     private void buildTabbedPane() {
         tabsPane = new JTabbedPane(JTabbedPane.LEFT);
+        tabsPane.add("Stats", statsUI);
         tabsPane.add("Discogs", discogsUI);
         tabsPane.add("Search Database",  dbSearchUI);
-        tabsPane.add("Stats", statsUI);
         addTabListener();
     } // buildTabbedPane()
 
@@ -70,9 +72,7 @@ public class MainUI extends JFrame {
                 JOptionPane.YES_NO_OPTION);
         if (authBoxChoice == JOptionPane.YES_OPTION) {
             OAuth1RequestToken requestToken = discogsAuth.redirectAuthorization();
-            String verifier = JOptionPane.showInputDialog("Enter verification code below.\n" +
-                    "If not automatically redirected, please visit: \n" +
-                    discogsAuth.getAuthUrl(requestToken));
+            String verifier = JOptionPane.showInputDialog("Enter verification code below:");
             if (verifier != null && !verifier.isEmpty()) {
                 try {
                     discogsAuth.getAuthorization(verifier, requestToken);

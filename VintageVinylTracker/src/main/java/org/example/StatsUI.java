@@ -71,7 +71,9 @@ public class StatsUI extends JPanel {
         statsText.append("<br>");
         statsText.append("\nTotal Estimated Value: $").append(String.format("%.2f", collectionStats.getTotalValue()));
         statsText.append("</html>");
-        return new JLabel(statsText.toString(), JLabel.CENTER);
+        JLabel statsLbl = new JLabel(statsText.toString(), JLabel.CENTER);
+        statsLbl.setFont(new Font("Arial", Font.PLAIN, 24));
+        return statsLbl;
     } // buildStatsJTA()
 
 } // StatsUI class
