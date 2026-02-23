@@ -1,7 +1,5 @@
 package org.example;
 
-import jdk.jfr.Event;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -216,19 +214,29 @@ public class DiscogsUI extends JPanel {
         String catNo = !catNoJTF.getText().isBlank() ? catNoJTF.getText() : null;
         albumArtLabel.setIcon(AsyncCalls.defaultThumbNail);
         pricingInfoLabel.setText("");
-        asyncSearchQueryCall(album, artist, year, catNo);
+        if (artist == null && album == null && year == null && catNo == null) {
+            pricingInfoLabel.setText("Please fill out at least one form field.");
+        }
+        else asyncSearchQueryCall(album, artist, year, catNo);
     } // searchDiscogs()
 
     private void displayResults() {
         DefaultTableModel model = (DefaultTableModel) discogsTable.getModel();
         model.setRowCount(0);
-        for (Record record : records) {
-            model.addRow(new String[]{record.getCatNo(),
-            record.getArtistName(),
-            record.getAlbumName(),
-            record.getYear(),
-            record.getCountry()
-            });
+        if (records.isEmpty()) {
+            pricingInfoLabel.setText("No results found.");
+            model.addRow(new String[]{"NO RESULTS", "NO RESULTS", "NO RESULTS", "NO RESULTS", "NO RESULTS"});
+
+        }
+        else {
+            for (Record record : records) {
+                model.addRow(new String[]{record.getCatNo(),
+                        record.getArtistName(),
+                        record.getAlbumName(),
+                        record.getYear(),
+                        record.getCountry()
+                });
+            }
         }
     } // displayResults()
 
@@ -244,7 +252,7 @@ public class DiscogsUI extends JPanel {
     } // getEntryField()
 
     private void asyncSearchQueryCall(String album, String artist, String year, String catNo) {
-        SwingWorker<Object, Void> worker = new SwingWorker<>() {
+        SwingWorker<Object, Object> worker = new SwingWorker<>() {
             @Override
             protected Object doInBackground() {
                 records = ParseAPIResponse.buildSearchQueryCollection(discogsAuth, album, artist, year, catNo);

@@ -19,7 +19,7 @@ public class AsyncCalls {
             @Override
             protected String doInBackground() {
                 return ParseAPIResponse.buildPricingQueryCollection(discogsAuth, id);
-            }
+            } // doInBackground()
 
             @Override
             protected void done() {
@@ -28,7 +28,7 @@ public class AsyncCalls {
                 } catch (InterruptedException | ExecutionException e) {
                     label.setText("Unavailable");
                 }
-            }
+            } // done()
         };
         worker.execute();
     } // asyncPricingCall()

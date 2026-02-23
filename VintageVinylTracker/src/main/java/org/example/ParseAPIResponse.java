@@ -20,6 +20,7 @@ public class ParseAPIResponse {
             "Fair (F)",
             "Poor (P)"
     };
+    private static final int RESULTSCAP = 250;
 
     public static double[] selectionPrices = new double[8];
 
@@ -29,7 +30,7 @@ public class ParseAPIResponse {
         int pageNo = 1;
         boolean hasNextPage = true;
 
-        while (hasNextPage) {
+        while (hasNextPage && records.size() < RESULTSCAP) {
             try {
                 String body = DiscogsClient.searchQuery(auth, album, artist, year, catNo, pageNo++);
                 JsonNode jsonNode = mapper.readTree(body);
@@ -37,7 +38,9 @@ public class ParseAPIResponse {
                 for (JsonNode node: jsonNode.path("results")) {
                     try {
                         records.add(convertNodeToRecord(node));
-                    } catch (Exception e) {}
+                    } catch (Exception e) {
+                        System.out.println("Skipping invalid record: " + e.getMessage());
+                    }
                 }
             } catch (IOException | ExecutionException | InterruptedException e) {
                 System.out.println("Could not complete search query: " + e.getMessage());

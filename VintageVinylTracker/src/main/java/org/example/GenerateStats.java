@@ -17,6 +17,7 @@ public class GenerateStats {
         this.discogsAuth = discogsAuth;
         this.dbAccess = dbAccess;
         parseOwnedAlbums();
+
     } // constructor
 
     public void parseOwnedAlbums() {
@@ -33,7 +34,7 @@ public class GenerateStats {
             totalValue += record.getValue();
             totalInvested += record.getPurchasePrice();
             if (mostValuableRecord.getValue() < record.getValue()) mostValuableRecord = record;
-            else if(leastValuableRecord.getValue() > record.getValue()) leastValuableRecord = record;
+            else if (leastValuableRecord.getValue() > record.getValue()) leastValuableRecord = record;
         }
     } // retrieveOwnedAlbums()
 
@@ -43,8 +44,7 @@ public class GenerateStats {
         totalValue = 0;
         mostValuableRecord = null;
         leastValuableRecord = null;
-
-    }
+    } // resetValues()
 
     // getters
     public int getOwnedCount() {
