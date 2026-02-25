@@ -67,7 +67,7 @@ public class MainUI extends JFrame {
 
     private void spawnAuthorizationInput() {
         int authBoxChoice = JOptionPane.showConfirmDialog(this,
-                "Sync your discogs account below!",
+                "Sync your discogs account?",
                 "Discogs Account Sync",
                 JOptionPane.YES_NO_OPTION);
         if (authBoxChoice == JOptionPane.YES_OPTION) {
@@ -85,7 +85,8 @@ public class MainUI extends JFrame {
     } // spawnAuthorizationInput()
 
     private void errorOptionPane(String message) {
-        JOptionPane.showMessageDialog(this, "Could not connect to Discogs: " + message, "Authorization Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(this, "Could not connect to Discogs: " + message,
+                "Authorization Error", JOptionPane.ERROR_MESSAGE);
     } // errorOptionPane()
 
     public static void main(String[] args) {

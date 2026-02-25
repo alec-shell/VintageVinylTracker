@@ -12,18 +12,22 @@ public class GenerateStats {
     private final DiscogsAuthorization discogsAuth;
     private final DBAccess dbAccess;
     private ArrayList<Record> ownedRecords;
+    private boolean updatedToday = false;
 
     public GenerateStats(DiscogsAuthorization discogsAuth,  DBAccess dbAccess) {
         this.discogsAuth = discogsAuth;
         this.dbAccess = dbAccess;
         parseOwnedAlbums();
-
     } // constructor
+
+    private boolean checkLastUpdate() {
+        return false;
+    }
 
     public void parseOwnedAlbums() {
         resetValues();
         ownedRecords = dbAccess.searchRecordEntries(null,
-                null, null, null, true);
+                null, null, null, "true");
         albumCount = ownedRecords.size();
 
         if  (albumCount > 0) {

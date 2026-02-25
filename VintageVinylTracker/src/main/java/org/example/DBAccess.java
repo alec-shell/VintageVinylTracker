@@ -65,7 +65,7 @@ public class DBAccess {
         }
     } // addEntry()
 
-    public final ArrayList<Record> searchRecordEntries(String bandName, String albumName, String year, String catNo, Boolean isOwned) {
+    public final ArrayList<Record> searchRecordEntries(String bandName, String albumName, String year, String catNo, String isOwned) {
         ArrayList<Record> resultsList = new ArrayList<>();
         try(PreparedStatement stmt = buildRecordSearchStmt(bandName, albumName, year, catNo, isOwned)) {
             ResultSet rs = stmt.executeQuery();
@@ -103,7 +103,7 @@ public class DBAccess {
         }
     } // deleteRecordEntry()
 
-    private PreparedStatement buildRecordSearchStmt(String bandName, String albumName, String year, String catNo, Boolean isOwned) throws SQLException {
+    private PreparedStatement buildRecordSearchStmt(String bandName, String albumName, String year, String catNo, String isOwned) throws SQLException {
         // build out search query conditionally
         StringBuilder stmtSB =  new StringBuilder();
         stmtSB.append("SELECT * FROM Vinyl WHERE 1=1");
@@ -111,7 +111,7 @@ public class DBAccess {
         if (albumName != null) {stmtSB.append(" AND album_name LIKE ?");}
         if (year != null) {stmtSB.append(" AND year LIKE ?");}
         if (catNo != null) {stmtSB.append(" AND cat_no LIKE ?");}
-        if (isOwned != null) {stmtSB.append(" AND is_owned = ?");}
+        if (!isOwned.equals("null")) {stmtSB.append(" AND is_owned = ?");}
         // fill out prepared values conditionally
         int paramIndex = 1;
         PreparedStatement ps = conn.prepareStatement(stmtSB.toString());
@@ -119,7 +119,8 @@ public class DBAccess {
         if (albumName != null) {ps.setString(paramIndex++, albumName);}
         if (year != null) {ps.setString(paramIndex++, year);}
         if (catNo != null) {ps.setString(paramIndex++, catNo);}
-        if (isOwned != null) {ps.setBoolean(paramIndex, isOwned);}
+        if (isOwned.equals("true")) ps.setBoolean(paramIndex, true);
+        else if (isOwned.equals("false")) ps.setBoolean(paramIndex, false);
         return ps;
     } // buildRecordSearchStmt()
 

@@ -77,12 +77,3 @@ public class StatsUI extends JPanel {
     } // buildStatsJTA()
 
 } // StatsUI class
-
-
-/*
- * - make API call to Discogs, (60 / min rate limit).
- * - update DB entry with new value.
- * - store pending total value.
- * When ASYNC operation is done, update collection value total.
- * ** Need to track update date, limiting transaction to one per day. Stored in external file. **
- */

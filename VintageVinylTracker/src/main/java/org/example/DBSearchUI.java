@@ -17,7 +17,7 @@ public class DBSearchUI extends JPanel {
     private final JTextField artistNameJTF =  new JTextField();
     private final JTextField yearJTF = new JTextField();
     private final JTextField catNoJTF = new JTextField();
-    private JCheckBox ownedSelector = null;
+    private final ButtonGroup ownedBtnGroup =  new ButtonGroup();
     private final String[] columnNames = new String[]{
             "Catalog No.",
             "Artist",
@@ -143,9 +143,9 @@ public class DBSearchUI extends JPanel {
         JPanel catalogNo = getEntryField("Catalog No.", catNoJTF);
         c.gridy = gridyCounter++;
         searchEntryForm.add(catalogNo, c);
-        ownedSelector = new JCheckBox(" --- Owned");
+        JPanel ownedSelectorPanel = buildOwnedSelectorPanel();
         c.gridy = gridyCounter++;
-        searchEntryForm.add(ownedSelector, c);
+        searchEntryForm.add(ownedSelectorPanel, c);
         JButton submit =  new JButton("Search");
         c.gridy = gridyCounter;
         searchEntryForm.add(submit, c);
@@ -153,12 +153,31 @@ public class DBSearchUI extends JPanel {
         return searchEntryForm;
     } // buildSearchEntryForm()
 
+    private JPanel buildOwnedSelectorPanel() {
+        JPanel ownedSelectorPanel = new JPanel();
+        ownedSelectorPanel.setBackground(Color.LIGHT_GRAY);
+        JRadioButton owned = new JRadioButton("Show Owned");
+        owned.setActionCommand("true");
+        JRadioButton wanted = new JRadioButton("Show Wanted");
+        wanted.setActionCommand("false");
+        JRadioButton all =  new JRadioButton("Show All");
+        all.setActionCommand("null");
+        all.setSelected(true);
+        ownedBtnGroup.add(owned);
+        ownedBtnGroup.add(wanted);
+        ownedBtnGroup.add(all);
+        ownedSelectorPanel.add(owned);
+        ownedSelectorPanel.add(wanted);
+        ownedSelectorPanel.add(all);
+        return ownedSelectorPanel;
+    } // ownedRadioSelector
+
     private void submitActionListener() {
         String artist = !artistNameJTF.getText().isBlank() ? artistNameJTF.getText() : null;
         String album = !albumNameJTF.getText().isBlank() ? albumNameJTF.getText() : null;
         String year = !yearJTF.getText().isBlank() ? yearJTF.getText() : null;
         String catNo = !catNoJTF.getText().isBlank() ? catNoJTF.getText() : null;
-        records = dbAccess.searchRecordEntries(artist, album, year, catNo, ownedSelector.isSelected());
+        records = dbAccess.searchRecordEntries(artist, album, year, catNo, ownedBtnGroup.getSelection().getActionCommand());
         updateResultsDisplay(records);
     } // submitActionListener()
 
