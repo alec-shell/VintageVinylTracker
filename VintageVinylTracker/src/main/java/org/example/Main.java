@@ -8,7 +8,7 @@ package org.example;
 
 import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.Keyring;
-import com.github.scribejava.core.model.OAuth1RequestToken;
+import org.example.client.AuthorizationClient;
 import org.example.gui.DBSearchUI;
 import org.example.gui.DiscogsUI;
 import org.example.gui.StatsUI;
@@ -20,9 +20,10 @@ import org.example.temp.DiscogsAuthorization;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.time.Duration;
-import java.util.concurrent.ExecutionException;
 
 
 public class Main extends JFrame {
@@ -31,7 +32,8 @@ public class Main extends JFrame {
     private final DBSearchUI dbSearchUI;
     private final DiscogsUI discogsUI;
     private final StatsUI statsUI;
-    private final DiscogsAuthorization discogsAuth;
+    AuthorizationClient authorizationClient;
+    private final DiscogsAuthorization discogsAuth; // remove
     private final GenerateStats collectionStats;
     private final EventTriggers eventTriggers;
     private final HttpClient  httpClient;
@@ -53,6 +55,7 @@ public class Main extends JFrame {
         } catch (BackendNotSupportedException e) {
             throw new RuntimeException(e);
         }
+        this.authorizationClient = new AuthorizationClient(httpClient, keyRing);
         this.discogsAuth = new DiscogsAuthorization();
         this.dbAccess = new DBAccess();
         this.collectionStats = new GenerateStats(discogsAuth, dbAccess);
@@ -76,14 +79,8 @@ public class Main extends JFrame {
         tabsPane.addChangeListener(_ -> {
             String tabTitle = tabsPane.getTitleAt(tabsPane.getSelectedIndex());
             if (tabTitle.equals("Discogs")) {
-                if (!discogsAuth.hasToken()) {
+                if (!authorizationClient.hasAuthorization()) {
                     spawnAuthorizationInput();
-                } else if (!discogsAuth.hasAuthorization()) {
-                    try {
-                        discogsAuth.verifyAccess();
-                    } catch (IOException | InterruptedException | ExecutionException ex) {
-                        errorOptionPane(ex.getMessage());
-                    }
                 }
             }
         });
@@ -95,15 +92,23 @@ public class Main extends JFrame {
                 "Discogs Account Sync",
                 JOptionPane.YES_NO_OPTION);
         if (authBoxChoice == JOptionPane.YES_OPTION) {
-            OAuth1RequestToken requestToken = discogsAuth.redirectAuthorization();
-            String verifier = JOptionPane.showInputDialog("Enter verification code below:");
-            if (verifier != null && !verifier.isEmpty()) {
-                try {
-                    discogsAuth.getAuthorization(verifier, requestToken);
-                    discogsAuth.verifyAccess();
-                } catch (IOException | ExecutionException | InterruptedException e) {
-                    errorOptionPane(e.getMessage());
+            try {
+                authorizationClient.getRequestToken();
+                authorizationClient.getAuthorizationURL();
+                Desktop.getDesktop().browse(new URI(authorizationClient.getURL()));
+                String verifier = JOptionPane.showInputDialog("Enter verification code below:");
+                if (verifier != null && !verifier.isEmpty()) {
+                    try {
+                        authorizationClient.getUserToken(verifier);
+                        if (authorizationClient.hasAuthorization()) {
+                            JOptionPane.showMessageDialog(this, "Discogs Account Sync Successful!");
+                        }
+                    } catch (IOException | InterruptedException e) {
+                        errorOptionPane(e.getMessage());
+                    }
                 }
+            } catch (IOException | InterruptedException | URISyntaxException e) {
+                throw new RuntimeException(e);
             }
         }
     } // spawnAuthorizationInput()

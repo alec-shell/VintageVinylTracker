@@ -1,11 +1,13 @@
 package org.example.client;
 
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import org.example.DTO.AuthTokenRequest;
-import org.example.DTO.VerifierURLRequest;
+import org.example.DTO.URLRequest;
+import org.example.config.URIConfig;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
@@ -18,7 +20,7 @@ public class AuthorizationClient {
     private final AuthTokenRequest requestTknDTO =  new AuthTokenRequest();
     private final JsonMapper mapper = new JsonMapper();
     private String url = null;
-    private Keyring keyRing;
+    private final Keyring keyRing;
 
     public AuthorizationClient(HttpClient httpClient, Keyring keyRing) {
         this.httpClient = httpClient;
@@ -38,7 +40,7 @@ public class AuthorizationClient {
     } // getRequestToken()
 
     public void getAuthorizationURL() throws IOException, InterruptedException {
-        String json = mapper.writeValueAsString(new VerifierURLRequest(requestTknDTO.token, requestTknDTO.secret));
+        String json = mapper.writeValueAsString(new URLRequest(requestTknDTO.token, requestTknDTO.secret));
         HttpRequest request = HttpRequest
                 .newBuilder()
                 .uri(URIConfig.REQUEST_VERIFIER_URI)
@@ -47,7 +49,7 @@ public class AuthorizationClient {
                 .build();
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         JsonNode nodes = mapper.readTree(response.body());
-        url =  nodes.get("url").asText();
+        url = nodes.get("url").asText();
     } // getAuthorizationURL()
 
     public void getUserToken(String verifier) throws IOException, InterruptedException {
@@ -68,7 +70,30 @@ public class AuthorizationClient {
         }
     } // getUserToken()
 
-    private void storeUserSecret(JsonNode nodes) throws PasswordAccessException {
+    public boolean hasAuthorization() {
+        try {
+            String token = keyRing.getPassword("VintageVinyl", "userToken");
+            String secret = keyRing.getPassword("VintageVinyl", "userSecret");
+            if (token == null || secret == null) return false;
+            String json = mapper.writeValueAsString(new URLRequest(token, secret));
+            HttpRequest request = HttpRequest
+                    .newBuilder()
+                    .uri(URIConfig.AUTH_VERIFIER_URI)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            JsonNode nodes = mapper.readTree(response.body());
+            return nodes.has("username");
+        } catch (PasswordAccessException e) {
+            return false;
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
+    } // hasAuthorization()
+
+        private void storeUserSecret(JsonNode nodes) throws PasswordAccessException {
         keyRing.setPassword("VintageVinyl", "userToken", nodes.get("token").asText());
         keyRing.setPassword("VintageVinyl", "userSecret", nodes.get("secret").asText());
     } // storeUserSecret()
