@@ -1,6 +1,6 @@
 package org.example.logic;
 
-import org.example.temp.DiscogsAuthorization;
+import org.example.client.ProxyClient;
 
 import java.util.ArrayList;
 
@@ -10,12 +10,12 @@ public class GenerateStats {
     private double totalValue = 0;
     private Record mostValuableRecord = null;
     private Record leastValuableRecord = null;
-    private final DiscogsAuthorization discogsAuth;
+    private final ProxyClient proxyClient;
     private final DBAccess dbAccess;
     private ArrayList<Record> ownedRecords;
 
-    public GenerateStats(DiscogsAuthorization discogsAuth,  DBAccess dbAccess) {
-        this.discogsAuth = discogsAuth;
+    public GenerateStats(ProxyClient proxyClient,  DBAccess dbAccess) {
+        this.proxyClient = proxyClient;
         this.dbAccess = dbAccess;
         parseOwnedAlbums();
     } // constructor

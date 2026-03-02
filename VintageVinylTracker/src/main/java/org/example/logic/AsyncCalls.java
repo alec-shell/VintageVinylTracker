@@ -1,7 +1,6 @@
 package org.example.logic;
 
-import org.example.temp.DiscogsAuthorization;
-import org.example.client.ParseAPIResponse;
+import org.example.client.ProxyClient;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -16,12 +15,12 @@ public class AsyncCalls {
             .getImage().getScaledInstance(albumArtWidth, albumArtHeight, Image.SCALE_SMOOTH);
     public static final ImageIcon defaultThumbNail = new ImageIcon(scaledDefaultThumbNail);
 
-    public static void asyncPricingCall(int id, JLabel label, DiscogsAuthorization discogsAuth) {
+    public static void asyncPricingCall(ProxyClient proxyClient, int id, JLabel label) {
         SwingWorker<String, Void> worker = new SwingWorker<>() {
 
             @Override
             protected String doInBackground() {
-                return ParseAPIResponse.buildPricingQueryCollection(discogsAuth, id);
+                return ParseAPIResponse.buildPricingQueryCollection(proxyClient, id);
             } // doInBackground()
 
             @Override

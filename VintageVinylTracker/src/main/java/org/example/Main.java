@@ -6,16 +6,17 @@
 
 package org.example;
 
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.Keyring;
 import org.example.client.AuthorizationClient;
+import org.example.client.ProxyClient;
 import org.example.gui.DBSearchUI;
 import org.example.gui.DiscogsUI;
 import org.example.gui.StatsUI;
 import org.example.logic.DBAccess;
 import org.example.logic.EventTriggers;
 import org.example.logic.GenerateStats;
-import org.example.temp.DiscogsAuthorization;
 
 import javax.swing.*;
 import java.awt.*;
@@ -33,11 +34,12 @@ public class Main extends JFrame {
     private final DiscogsUI discogsUI;
     private final StatsUI statsUI;
     AuthorizationClient authorizationClient;
-    private final DiscogsAuthorization discogsAuth; // remove
     private final GenerateStats collectionStats;
     private final EventTriggers eventTriggers;
     private final HttpClient  httpClient;
     private final Keyring keyRing;
+    private final ProxyClient proxyClient;
+    private final JsonMapper mapper =  new JsonMapper();
 
     public Main() {
         this.setTitle("Vintage Vinyl");
@@ -55,14 +57,14 @@ public class Main extends JFrame {
         } catch (BackendNotSupportedException e) {
             throw new RuntimeException(e);
         }
-        this.authorizationClient = new AuthorizationClient(httpClient, keyRing);
-        this.discogsAuth = new DiscogsAuthorization();
+        this.authorizationClient = new AuthorizationClient(httpClient, keyRing, mapper);
+        this.proxyClient = new ProxyClient(httpClient, keyRing, mapper);
         this.dbAccess = new DBAccess();
-        this.collectionStats = new GenerateStats(discogsAuth, dbAccess);
+        this.collectionStats = new GenerateStats(proxyClient, dbAccess);
         this.statsUI = new StatsUI(collectionStats);
         this.eventTriggers = new EventTriggers(statsUI);
-        this.dbSearchUI = new DBSearchUI(discogsAuth, dbAccess, collectionStats,  eventTriggers);
-        this.discogsUI = new DiscogsUI(discogsAuth, dbAccess, collectionStats, eventTriggers);
+        this.dbSearchUI = new DBSearchUI(proxyClient, dbAccess, collectionStats,  eventTriggers);
+        this.discogsUI = new DiscogsUI(proxyClient, dbAccess, collectionStats, eventTriggers);
         buildTabbedPane();
         this.add(tabsPane, BorderLayout.CENTER);
     } // constructor

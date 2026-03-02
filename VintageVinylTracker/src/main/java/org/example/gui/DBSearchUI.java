@@ -1,11 +1,11 @@
 package org.example.gui;
 
+import org.example.client.ProxyClient;
 import org.example.logic.Record;
 import org.example.logic.AsyncCalls;
 import org.example.logic.DBAccess;
 import org.example.logic.EventTriggers;
 import org.example.logic.GenerateStats;
-import org.example.temp.DiscogsAuthorization;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -37,11 +37,11 @@ public class DBSearchUI extends JPanel {
     private ArrayList<Record> records;
     private JLabel albumArtLabel;
     private final JLabel pricingInfoLabel = new JLabel();
-    private final DiscogsAuthorization discogsAuth;
+    private final ProxyClient proxyClient;
 
-    public DBSearchUI( DiscogsAuthorization discogsAuth, DBAccess dbAccess, GenerateStats collectionStats, EventTriggers eventTriggers) {
+    public DBSearchUI(ProxyClient proxyClient, DBAccess dbAccess, GenerateStats collectionStats, EventTriggers eventTriggers) {
         this.dbAccess = dbAccess;
-        this.discogsAuth = discogsAuth;
+        this.proxyClient = proxyClient;
         this.collectionStats = collectionStats;
         this.eventTriggers = eventTriggers;
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
@@ -60,7 +60,7 @@ public class DBSearchUI extends JPanel {
                 int rowIndex = dbTable.getSelectedRow();
                 if (records == null || records.size() <= rowIndex) { return; }
                 AsyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel);
-                AsyncCalls.asyncPricingCall(records.get(rowIndex).getID(), pricingInfoLabel, discogsAuth);
+                AsyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel);
             }
             @Override
             public void mousePressed(MouseEvent e) {}

@@ -1,12 +1,12 @@
 package org.example.gui;
 
+import org.example.client.ProxyClient;
 import org.example.logic.Record;
 import org.example.logic.AsyncCalls;
 import org.example.logic.DBAccess;
 import org.example.logic.EventTriggers;
 import org.example.logic.GenerateStats;
-import org.example.temp.DiscogsAuthorization;
-import org.example.client.ParseAPIResponse;
+import org.example.logic.ParseAPIResponse;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -31,14 +31,14 @@ public class DiscogsUI extends JPanel {
     };
     private JLabel albumArtLabel;
     private final JLabel pricingInfoLabel = new JLabel();
-    private final DiscogsAuthorization discogsAuth;
+    private final ProxyClient proxyClient;
     private final DBAccess dbAccess;
     private final GenerateStats collectionStats;
     private final EventTriggers eventTriggers;
     private ArrayList<Record> records;
 
-    public DiscogsUI(DiscogsAuthorization discogsAuth, DBAccess dbAccess, GenerateStats collectionStats, EventTriggers eventTriggers) {
-        this.discogsAuth = discogsAuth;
+    public DiscogsUI(ProxyClient proxyClient, DBAccess dbAccess, GenerateStats collectionStats, EventTriggers eventTriggers) {
+        this.proxyClient = proxyClient;
         this.dbAccess = dbAccess;
         this.collectionStats = collectionStats;
         this.eventTriggers = eventTriggers;
@@ -58,7 +58,7 @@ public class DiscogsUI extends JPanel {
                 int rowIndex = discogsTable.getSelectedRow();
                 if (records == null || records.size() <= rowIndex) { return; }
                 AsyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel);
-                AsyncCalls.asyncPricingCall(records.get(rowIndex).getID(), pricingInfoLabel, discogsAuth);
+                AsyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel);
             }
             @Override
             public void mousePressed(MouseEvent e) {}
@@ -263,7 +263,7 @@ public class DiscogsUI extends JPanel {
         SwingWorker<Object, Object> worker = new SwingWorker<>() {
             @Override
             protected Object doInBackground() {
-                records = ParseAPIResponse.buildSearchQueryCollection(discogsAuth, album, artist, year, catNo);
+                records = ParseAPIResponse.buildSearchQueryCollection(proxyClient, album, artist, year, catNo);
                 return null;
             } // doInBackground()
 

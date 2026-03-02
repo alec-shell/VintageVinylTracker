@@ -1,14 +1,11 @@
-package org.example.client;
+package org.example.logic;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.logic.Record;
-import org.example.temp.DiscogsAuthorization;
-import org.example.temp.DiscogsClient;
+import org.example.client.ProxyClient;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 
 public class ParseAPIResponse {
@@ -24,10 +21,9 @@ public class ParseAPIResponse {
             "Poor (P)"
     };
     private static final int RESULTS_CAP = 250;
-
     public static double[] selectionPrices = new double[8];
 
-    public static ArrayList<Record> buildSearchQueryCollection(DiscogsAuthorization auth, String album, String artist, String year, String catNo) {
+    public static ArrayList<Record> buildSearchQueryCollection(ProxyClient proxyClient, String album, String artist, String year, String catNo) {
         ObjectMapper mapper = new ObjectMapper();
         ArrayList<Record> records = new ArrayList<>();
         int pageNo = 1;
@@ -35,7 +31,7 @@ public class ParseAPIResponse {
 
         while (hasNextPage && records.size() < RESULTS_CAP) {
             try {
-                String body = DiscogsClient.searchQuery(auth, album, artist, year, catNo, pageNo++);
+                String body = proxyClient.getSearchQuery(album, artist, year, catNo, pageNo++);
                 JsonNode jsonNode = mapper.readTree(body);
                 hasNextPage = jsonNode.get("pagination").get("urls").has("next");
                 for (JsonNode node: jsonNode.path("results")) {
@@ -45,7 +41,7 @@ public class ParseAPIResponse {
                         System.out.println("Skipping invalid record: " + e.getMessage());
                     }
                 }
-            } catch (IOException | ExecutionException | InterruptedException e) {
+            } catch (IOException e) {
                 System.out.println("Could not complete search query: " + e.getMessage());
             }
         }
@@ -75,14 +71,14 @@ public class ParseAPIResponse {
                 "NONE");
     } // convertNodeToRecord()
 
-    public static String buildPricingQueryCollection(DiscogsAuthorization auth, int id) {
+    public static String buildPricingQueryCollection(ProxyClient proxyClient, int id) {
         ObjectMapper mapper = new ObjectMapper();
         ArrayList<String> pricingByCondition = new ArrayList<>();
         try {
-            String json = DiscogsClient.getPriceSuggestions(auth, id);
+            String json = proxyClient.getPriceSuggestions(proxyClient, id);
             JsonNode jsonNode = mapper.readTree(json);
             addConditionalPrices(jsonNode, pricingByCondition);
-        } catch (IOException | ExecutionException | InterruptedException e) {
+        } catch (IOException e) {
             System.out.println("Could not complete pricing query: " + e.getMessage());
         }
         StringBuilder returnString = new StringBuilder();

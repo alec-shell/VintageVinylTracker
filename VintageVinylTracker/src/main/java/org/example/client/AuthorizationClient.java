@@ -18,13 +18,14 @@ import java.net.http.HttpResponse;
 public class AuthorizationClient {
     private final HttpClient httpClient;
     private final AuthTokenRequest requestTknDTO =  new AuthTokenRequest();
-    private final JsonMapper mapper = new JsonMapper();
+    private final JsonMapper mapper;
     private String url = null;
     private final Keyring keyRing;
 
-    public AuthorizationClient(HttpClient httpClient, Keyring keyRing) {
+    public AuthorizationClient(HttpClient httpClient, Keyring keyRing, JsonMapper mapper) {
         this.httpClient = httpClient;
         this.keyRing = keyRing;
+        this.mapper = mapper;
     } // constructor
 
     public void getRequestToken() throws IOException, InterruptedException {
