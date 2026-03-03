@@ -7,6 +7,7 @@
 package org.example.logic;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class DBAccess {
@@ -38,7 +39,16 @@ public class DBAccess {
                     value REAL NOT NULL,
                     condition VARCHAR(40) NOT NULL)
                     """;
-        conn.prepareStatement(createVinylTable).execute();
+        try (PreparedStatement statement = conn.prepareStatement(createVinylTable)) {
+            statement.execute();
+        }
+        String createMetadataTable = """
+                CREATE TABLE IF NOT EXISTS
+                Metadata(last_update DATE NOT NULL)
+                """;
+        try (PreparedStatement statement = conn.prepareStatement(createMetadataTable)) {
+            statement.execute();
+        }
     } // initTables()
 
     public final Boolean addRecordEntry(int id, String bandName, String albumName, String year,
@@ -91,9 +101,8 @@ public class DBAccess {
     } // searchRecordEntries()
 
     public boolean deleteRecordEntry(int id) {
-        try {
-            String deleteStmt = "DELETE FROM Vinyl WHERE id = ?";
-            PreparedStatement stmt = conn.prepareStatement(deleteStmt);
+        String deleteStmt = "DELETE FROM Vinyl WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(deleteStmt)) {
             stmt.setInt(1, id);
             stmt.execute();
             return true;
@@ -103,7 +112,9 @@ public class DBAccess {
         }
     } // deleteRecordEntry()
 
-    private PreparedStatement buildRecordSearchStmt(String bandName, String albumName, String year, String catNo, String isOwned) throws SQLException {
+    private PreparedStatement buildRecordSearchStmt(String bandName, String albumName, String year,
+                                                    String catNo, String isOwned)
+            throws SQLException {
         // build out search query conditionally
         StringBuilder stmtSB =  new StringBuilder();
         stmtSB.append("SELECT * FROM Vinyl WHERE 1=1");
@@ -123,5 +134,49 @@ public class DBAccess {
         else if (isOwned.equals("false")) ps.setBoolean(paramIndex, false);
         return ps;
     } // buildRecordSearchStmt()
+
+    public boolean checkForUpdate() {
+        String stmt = "SELECT last_update FROM Metadata";
+        try (PreparedStatement ps = conn.prepareStatement(stmt)) {
+            ResultSet rs = ps.executeQuery();
+            if (!rs.next()) {return true;}
+            Date date = rs.getDate("last_update");
+            return date != null && !date.equals(Date.valueOf(LocalDate.now()));
+        } catch (SQLException e) {
+            System.out.println("SQL Exception... " + e.getMessage());
+            return true;
+        }
+    } // checkForUpdate()
+
+    public void updateRecordPrice(int id, double newPrice) {
+        String updateStmt =  "UPDATE Vinyl SET value = ? WHERE id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(updateStmt)) {
+            ps.setDouble(1, newPrice);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("SQL Exception... " + e.getMessage());
+        }
+    } // updateRecordPrice()
+
+    public void updateMetaDate() {
+        String dateStmt = "UPDATE Metadata SET last_update = ?";
+        int rowsUpdated = 0;
+        try (PreparedStatement ps = conn.prepareStatement(dateStmt)) {
+            ps.setDate(1, Date.valueOf(LocalDate.now()));
+            rowsUpdated = ps.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("SQL Exception... " + e.getMessage());
+        }
+        if (rowsUpdated == 0) {
+            String initStmt = "INSERT INTO Metadata (last_update) VALUES (?)";
+            try (PreparedStatement ps = conn.prepareStatement(initStmt)) {
+                ps.setDate(1, Date.valueOf(LocalDate.now()));
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                System.out.println("SQL Exception... " + e.getMessage());
+            }
+        }
+    } // updateUpdateDate()
 
 } // DBAccess class

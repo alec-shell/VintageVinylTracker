@@ -16,6 +16,9 @@ public class StatsUI extends JPanel {
         this.setLayout(new BorderLayout());
         this.setBackground(Color.LIGHT_GRAY);
         buildPanel();
+        if (collectionStats.isUpdating()) {
+            updateStats();
+        }
     } // constructor
 
     public void buildPanel() {
@@ -79,5 +82,21 @@ public class StatsUI extends JPanel {
         statsLbl.setFont(new Font("Arial", Font.PLAIN, 24));
         return statsLbl;
     } // buildStatsJTA()
+
+    private void updateStats() {
+        SwingWorker<Object, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                collectionStats.updateOwnedValues();
+                return null;
+            } // doInBackgroun()
+
+            @Override
+            protected void done() {
+                buildPanel();
+            } // done()
+        };
+        worker.execute();
+    } // updateStats()
 
 } // StatsUI class

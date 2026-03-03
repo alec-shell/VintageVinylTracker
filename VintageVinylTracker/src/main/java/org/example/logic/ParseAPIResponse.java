@@ -75,7 +75,7 @@ public class ParseAPIResponse {
         ObjectMapper mapper = new ObjectMapper();
         ArrayList<String> pricingByCondition = new ArrayList<>();
         try {
-            String json = proxyClient.getPriceSuggestions(proxyClient, id);
+            String json = proxyClient.getPriceSuggestions(id);
             JsonNode jsonNode = mapper.readTree(json);
             addConditionalPrices(jsonNode, pricingByCondition);
         } catch (IOException e) {
@@ -91,7 +91,7 @@ public class ParseAPIResponse {
         return returnString.toString();
     } // buildPricingQueryCollection()
 
-    private static void addConditionalPrices(JsonNode jsonNode,  ArrayList<String> pricingByCondition) {
+    private static void addConditionalPrices(JsonNode jsonNode, ArrayList<String> pricingByCondition) {
         for (int i = 0; i < conditions.length; i++) {
             Double price = Double.parseDouble(jsonNode.path(conditions[i]).path("value").asText());
             selectionPrices[i] = price;

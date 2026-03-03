@@ -60,7 +60,7 @@ public class Main extends JFrame {
         this.authorizationClient = new AuthorizationClient(httpClient, keyRing, mapper);
         this.proxyClient = new ProxyClient(httpClient, keyRing, mapper);
         this.dbAccess = new DBAccess();
-        this.collectionStats = new GenerateStats(proxyClient, dbAccess);
+        this.collectionStats = new GenerateStats(proxyClient, dbAccess, mapper);
         this.statsUI = new StatsUI(collectionStats);
         this.eventTriggers = new EventTriggers(statsUI);
         this.dbSearchUI = new DBSearchUI(proxyClient, dbAccess, collectionStats,  eventTriggers);

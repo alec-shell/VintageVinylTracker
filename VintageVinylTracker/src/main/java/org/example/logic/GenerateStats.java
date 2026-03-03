@@ -1,8 +1,12 @@
 package org.example.logic;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.example.client.ProxyClient;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GenerateStats {
     private int albumCount = 0;
@@ -12,12 +16,16 @@ public class GenerateStats {
     private Record leastValuableRecord = null;
     private final ProxyClient proxyClient;
     private final DBAccess dbAccess;
+    private final JsonMapper mapper;
     private ArrayList<Record> ownedRecords;
+    private boolean isUpdating = false;
 
-    public GenerateStats(ProxyClient proxyClient,  DBAccess dbAccess) {
+    public GenerateStats(ProxyClient proxyClient, DBAccess dbAccess, JsonMapper mapper) {
         this.proxyClient = proxyClient;
         this.dbAccess = dbAccess;
+        this.mapper = mapper;
         parseOwnedAlbums();
+        isUpdating = dbAccess.checkForUpdate();
     } // constructor
 
     public void parseOwnedAlbums() {
@@ -37,6 +45,26 @@ public class GenerateStats {
             else if (leastValuableRecord.getValue() > record.getValue()) leastValuableRecord = record;
         }
     } // retrieveOwnedAlbums()
+
+    private void updateRecordValue(Record record) {
+        try {
+            String priceResponse = proxyClient.getPriceSuggestions(record.getID());
+            JsonNode nodes = mapper.readTree(priceResponse);
+            double newPrice = Double.parseDouble(nodes.get(record.getCondition()).get("value").asText());
+            dbAccess.updateRecordPrice(record.getID(), newPrice);
+        } catch (JsonProcessingException e) {
+            System.out.println("Error updating record price... " + e.getMessage());
+        }
+    } // updateRecordValue()
+
+    public void updateOwnedValues() {
+        List<Record> ownedCopies =  new ArrayList<>(ownedRecords);
+        for (Record copy: ownedCopies) {
+            updateRecordValue(copy);
+        }
+        parseOwnedAlbums();
+        dbAccess.updateMetaDate();
+    } // updateOwnedValues()
 
     private void resetValues() {
         albumCount = 0;
@@ -66,5 +94,9 @@ public class GenerateStats {
     public Record getLeastValuableRecord() {
         return leastValuableRecord;
     } // getLeastValuableRecord()
+
+    public boolean isUpdating() {
+        return isUpdating;
+    } // isUpdating()
 
 } // GenerateStats class

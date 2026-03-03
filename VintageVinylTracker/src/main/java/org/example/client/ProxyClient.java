@@ -3,6 +3,7 @@ package org.example.client;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
+import org.example.DTO.PricingRequest;
 import org.example.DTO.SearchRequest;
 import org.example.config.URIConfig;
 
@@ -25,7 +26,8 @@ public class ProxyClient {
 
     public String getSearchQuery(String album, String artist, String year, String catNo, int pageNo) {
         try {
-            String json = mapper.writeValueAsString(new SearchRequest(keyRing.getPassword("VintageVinyl", "userToken"),
+            String json = mapper
+                    .writeValueAsString(new SearchRequest(keyRing.getPassword("VintageVinyl", "userToken"),
                     keyRing.getPassword("VintageVinyl", "userSecret"),
                     artist, album, year, catNo, pageNo));
             HttpRequest request = HttpRequest.newBuilder()
@@ -40,8 +42,22 @@ public class ProxyClient {
         }
     } // getSearchQuery()
 
-    public String getPriceSuggestions(ProxyClient proxyClient, int id) {
-        return null;
+    public String getPriceSuggestions(int id) {
+        try {
+            String json = mapper
+                    .writeValueAsString(new PricingRequest(id,
+                            keyRing.getPassword("VintageVinyl", "userToken"),
+                            keyRing.getPassword("VintageVinyl", "userSecret")));
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URIConfig.PRICING_URI)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            return response.body();
+        } catch (PasswordAccessException | IOException | InterruptedException e) {
+            throw  new RuntimeException(e);
+        }
     } // getPricingSuggestions()
 
 } // DiscogsClient class
