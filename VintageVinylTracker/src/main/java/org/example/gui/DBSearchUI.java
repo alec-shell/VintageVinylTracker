@@ -39,7 +39,8 @@ public class DBSearchUI extends JPanel {
     private final JLabel pricingInfoLabel = new JLabel();
     private final ProxyClient proxyClient;
 
-    public DBSearchUI(ProxyClient proxyClient, DBAccess dbAccess, GenerateStats collectionStats, EventTriggers eventTriggers) {
+    public DBSearchUI(ProxyClient proxyClient, DBAccess dbAccess,
+                      GenerateStats collectionStats, EventTriggers eventTriggers) {
         this.dbAccess = dbAccess;
         this.proxyClient = proxyClient;
         this.collectionStats = collectionStats;

@@ -2,6 +2,9 @@ package org.example.logic;
 
 import org.example.gui.StatsUI;
 
+import javax.swing.*;
+
+
 public class EventTriggers {
     private StatsUI statsUI;
     public EventTriggers(StatsUI statsUI) {

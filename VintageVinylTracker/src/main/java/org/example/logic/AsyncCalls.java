@@ -26,7 +26,7 @@ public class AsyncCalls {
             @Override
             protected void done() {
                 try {
-                    label.setText(this.get().toString());
+                    label.setText(this.get());
                 } catch (InterruptedException | ExecutionException e) {
                     label.setText("Unavailable");
                 }

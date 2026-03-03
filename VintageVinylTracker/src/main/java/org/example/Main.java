@@ -25,6 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.time.Duration;
+import java.util.concurrent.ExecutionException;
 
 
 public class Main extends JFrame {
@@ -40,6 +41,7 @@ public class Main extends JFrame {
     private final Keyring keyRing;
     private final ProxyClient proxyClient;
     private final JsonMapper mapper =  new JsonMapper();
+    private boolean sessionAuth = false;
 
     public Main() {
         this.setTitle("Vintage Vinyl");
@@ -80,10 +82,8 @@ public class Main extends JFrame {
     private void addTabListener() {
         tabsPane.addChangeListener(_ -> {
             String tabTitle = tabsPane.getTitleAt(tabsPane.getSelectedIndex());
-            if (tabTitle.equals("Discogs")) {
-                if (!authorizationClient.hasAuthorization()) {
-                    spawnAuthorizationInput();
-                }
+            if (tabTitle.equals("Discogs") && !sessionAuth) {
+                asyncAuthCheck();
             }
         });
     } // addTabListener()
@@ -103,6 +103,7 @@ public class Main extends JFrame {
                     try {
                         authorizationClient.getUserToken(verifier);
                         if (authorizationClient.hasAuthorization()) {
+                            sessionAuth = true;
                             JOptionPane.showMessageDialog(this, "Discogs Account Sync Successful!");
                         }
                     } catch (IOException | InterruptedException e) {
@@ -124,5 +125,28 @@ public class Main extends JFrame {
         JFrame frame = new Main();
         frame.setVisible(true);
     } // main()
+
+    private void asyncAuthCheck() {
+        SwingWorker<Boolean, Void> worker = new SwingWorker() {
+
+            @Override
+            protected Boolean doInBackground() throws Exception {
+                return authorizationClient.hasAuthorization();
+            } // doInBackground()
+
+            @Override
+            protected void done() {
+                try {
+                    if ((Boolean) get() == false) {
+                        spawnAuthorizationInput();
+                    }
+                    else sessionAuth = true;
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
+                }
+            } // done()
+        };
+        worker.execute();
+    } // asyncAuthCheck()
 
 } // TrackerUI class
