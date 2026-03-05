@@ -33,12 +33,16 @@ public class StatsUI extends JPanel {
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
-        JLabel mostValuableArtwork =  new JLabel();
-        JLabel leastValuableArtwork =  new JLabel();
+        JLabel mostValuableArtwork = new JLabel();
+        JLabel leastValuableArtwork = new JLabel();
         mostValuableArtwork.setPreferredSize(new Dimension(AsyncCalls.albumArtWidth, AsyncCalls.albumArtHeight));
         leastValuableArtwork.setPreferredSize(new Dimension(AsyncCalls.albumArtWidth, AsyncCalls.albumArtHeight));
-        AsyncCalls.asyncThumbnailCall(collectionStats.getMostValuableRecord().getThumbUrl(), mostValuableArtwork);
-        AsyncCalls.asyncThumbnailCall(collectionStats.getLeastValuableRecord().getThumbUrl(), leastValuableArtwork);
+        String mostValUrl = collectionStats.getMostValuableRecord() != null ?
+                collectionStats.getMostValuableRecord().getThumbUrl() : "";
+        String leastValUrl = collectionStats.getLeastValuableRecord() != null ?
+                collectionStats.getLeastValuableRecord().getThumbUrl() : "";
+        AsyncCalls.asyncThumbnailCall(mostValUrl, mostValuableArtwork);
+        AsyncCalls.asyncThumbnailCall(leastValUrl, leastValuableArtwork);
         displayPanel.add(buildAlbumContainer(collectionStats.getMostValuableRecord(), "Most Valuable: ",  mostValuableArtwork),  c);
         c.gridx = 2;
         displayPanel.add(buildAlbumContainer(collectionStats.getLeastValuableRecord(), "Least Valuable: ", leastValuableArtwork), c);
@@ -50,22 +54,27 @@ public class StatsUI extends JPanel {
         container.setBackground(Color.LIGHT_GRAY);
         container.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
         container.setLayout(new BorderLayout());
-        StringBuilder infoText = new StringBuilder();
-        infoText.append("<html>");
-        infoText.append(record.getAlbumName());
-        infoText.append("<br>");
-        infoText.append(record.getArtistName());
-        infoText.append("<br>");
-        infoText.append("Purchase Price: $");
-        infoText.append(String.format("%.2f", record.getPurchasePrice()));
-        infoText.append("<br>");
-        infoText.append("Current Value: $");
-        infoText.append(String.format("%.2f", record.getValue()));
-        infoText.append("</html>");
-        JLabel albumInfo = new JLabel(infoText.toString(), JLabel.CENTER);
+        if (record != null) {
+            StringBuilder infoText = new StringBuilder();
+            infoText.append("<html>");
+            infoText.append(record.getAlbumName());
+            infoText.append("<br>");
+            infoText.append(record.getArtistName());
+            infoText.append("<br>");
+            infoText.append("Purchase Price: $");
+            infoText.append(String.format("%.2f", record.getPurchasePrice()));
+            infoText.append("<br>");
+            infoText.append("Current Value: $");
+            infoText.append(String.format("%.2f", record.getValue()));
+            infoText.append("</html>");
+            JLabel albumInfo = new JLabel(infoText.toString(), JLabel.CENTER);
+            container.add(albumInfo, BorderLayout.SOUTH);
+        } else {
+            JLabel albumInfo = new JLabel("",  JLabel.CENTER);
+            container.add(albumInfo, BorderLayout.SOUTH);
+        }
         container.add(new JLabel(title), BorderLayout.NORTH);
         container.add(artwork, BorderLayout.CENTER);
-        container.add(albumInfo, BorderLayout.SOUTH);
         return container;
     } // buildAlbumContainer()
 
