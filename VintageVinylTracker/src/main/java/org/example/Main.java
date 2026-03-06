@@ -7,6 +7,7 @@
 package org.example;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.formdev.flatlaf.FlatDarkLaf;
 import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.Keyring;
 import org.example.client.AuthorizationClient;
@@ -26,6 +27,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.concurrent.ExecutionException;
+import org.example.logic.AsyncCalls;
 
 
 public class Main extends JFrame {
@@ -40,6 +42,7 @@ public class Main extends JFrame {
     private final HttpClient  httpClient;
     private final Keyring keyRing;
     private final ProxyClient proxyClient;
+    private final AsyncCalls asyncCalls;
     private final JsonMapper mapper =  new JsonMapper();
     private boolean sessionAuth = false;
 
@@ -48,6 +51,7 @@ public class Main extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(1000, 600);
         this.setLayout(new BorderLayout());
+        this.asyncCalls = new AsyncCalls();
         this.httpClient = HttpClient
                 .newBuilder()
                 .version(HttpClient.Version.HTTP_2)
@@ -63,10 +67,10 @@ public class Main extends JFrame {
         this.proxyClient = new ProxyClient(httpClient, keyRing, mapper);
         this.dbAccess = new DBAccess();
         this.collectionStats = new GenerateStats(proxyClient, dbAccess, mapper);
-        this.statsUI = new StatsUI(collectionStats);
+        this.statsUI = new StatsUI(collectionStats, asyncCalls);
         this.eventTriggers = new EventTriggers(statsUI);
-        this.dbSearchUI = new DBSearchUI(proxyClient, dbAccess, collectionStats,  eventTriggers);
-        this.discogsUI = new DiscogsUI(proxyClient, dbAccess, collectionStats, eventTriggers);
+        this.dbSearchUI = new DBSearchUI(proxyClient, dbAccess, collectionStats,  eventTriggers, asyncCalls);
+        this.discogsUI = new DiscogsUI(proxyClient, dbAccess, collectionStats, eventTriggers, asyncCalls);
         buildTabbedPane();
         this.add(tabsPane, BorderLayout.CENTER);
     } // constructor
@@ -121,11 +125,6 @@ public class Main extends JFrame {
                 "Authorization Error", JOptionPane.ERROR_MESSAGE);
     } // errorOptionPane()
 
-    public static void main(String[] args) {
-        JFrame frame = new Main();
-        frame.setVisible(true);
-    } // main()
-
     private void asyncAuthCheck() {
         SwingWorker<Boolean, Void> worker = new SwingWorker() {
 
@@ -149,4 +148,10 @@ public class Main extends JFrame {
         worker.execute();
     } // asyncAuthCheck()
 
+    public static void main(String[] args) {
+        FlatDarkLaf.setup();
+        JFrame frame = new Main();
+        frame.setVisible(true);
+    } // main()
+        
 } // TrackerUI class

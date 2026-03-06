@@ -38,17 +38,20 @@ public class DBSearchUI extends JPanel {
     private JLabel albumArtLabel;
     private final JLabel pricingInfoLabel = new JLabel();
     private final ProxyClient proxyClient;
+    private final AsyncCalls asyncCalls;
 
     public DBSearchUI(ProxyClient proxyClient, DBAccess dbAccess,
-                      GenerateStats collectionStats, EventTriggers eventTriggers) {
+                      GenerateStats collectionStats, EventTriggers eventTriggers,
+                      AsyncCalls asyncCalls) {
         this.dbAccess = dbAccess;
         this.proxyClient = proxyClient;
         this.collectionStats = collectionStats;
         this.eventTriggers = eventTriggers;
+        this.asyncCalls = asyncCalls;
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         dbTable = new JTable(model);
         addTableListener();
-        this.setBackground(Color.LIGHT_GRAY);
+        this.setBackground(Color.DARK_GRAY);
         this.setLayout(new BorderLayout());
         this.add(buildUIPanel(), BorderLayout.NORTH);
         this.add(new JScrollPane(dbTable), BorderLayout.CENTER);
@@ -60,8 +63,8 @@ public class DBSearchUI extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 int rowIndex = dbTable.getSelectedRow();
                 if (records == null || records.size() <= rowIndex) { return; }
-                AsyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel);
-                AsyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel);
+                asyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel);
+                asyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel);
             }
             @Override
             public void mousePressed(MouseEvent e) {}
@@ -79,7 +82,7 @@ public class DBSearchUI extends JPanel {
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
-        temp.setBackground(Color.LIGHT_GRAY);
+        temp.setBackground(Color.DARK_GRAY);
         temp.add(buildAlbumInfoDisplay(), c);
         c.gridx = 1;
         temp.add(buildSearchEntryForm(), c);
@@ -98,7 +101,7 @@ public class DBSearchUI extends JPanel {
         if (deleted) {
             records.remove(selectedIndex);
             updateResultsDisplay(records);
-            albumArtLabel.setIcon(AsyncCalls.defaultThumbNail);
+            albumArtLabel.setIcon(asyncCalls.defaultThumbNail);
             pricingInfoLabel.setText("");
             collectionStats.parseOwnedAlbums();
             eventTriggers.updateStatsUI();
@@ -111,14 +114,14 @@ public class DBSearchUI extends JPanel {
 
     private JPanel buildAlbumInfoDisplay() {
         JPanel albumInfoPanel = new JPanel();
-        albumInfoPanel.setBackground(Color.LIGHT_GRAY);
+        albumInfoPanel.setBackground(Color.DARK_GRAY);
         albumInfoPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(5, 5, 5, 5);
         int gridxCounter = 0;
         c.gridy = 0;
-        albumArtLabel = new JLabel(AsyncCalls.defaultThumbNail);
+        albumArtLabel = new JLabel(asyncCalls.defaultThumbNail);
         albumArtLabel.setPreferredSize(new Dimension(AsyncCalls.albumArtWidth, AsyncCalls.albumArtHeight));
         c.gridx = gridxCounter++;
         albumInfoPanel.add(albumArtLabel, c);
@@ -130,7 +133,7 @@ public class DBSearchUI extends JPanel {
 
     private JPanel buildSearchEntryForm() {
         JPanel searchEntryForm = new JPanel();
-        searchEntryForm.setBackground(Color.LIGHT_GRAY);
+        searchEntryForm.setBackground(Color.DARK_GRAY);
         searchEntryForm.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -163,13 +166,16 @@ public class DBSearchUI extends JPanel {
 
     private JPanel buildOwnedSelectorPanel() {
         JPanel ownedSelectorPanel = new JPanel();
-        ownedSelectorPanel.setBackground(Color.LIGHT_GRAY);
+        ownedSelectorPanel.setBackground(Color.DARK_GRAY);
         JRadioButton owned = new JRadioButton("Show Owned");
         owned.setActionCommand("true");
+        owned.setBackground(Color.DARK_GRAY);
         JRadioButton wanted = new JRadioButton("Show Wanted");
         wanted.setActionCommand("false");
+        wanted.setBackground(Color.DARK_GRAY);
         JRadioButton all =  new JRadioButton("Show All");
         all.setActionCommand("null");
+        all.setBackground(Color.DARK_GRAY);
         all.setSelected(true);
         ownedBtnGroup.add(owned);
         ownedBtnGroup.add(wanted);
@@ -191,7 +197,7 @@ public class DBSearchUI extends JPanel {
 
     private JPanel getEntryField(String fieldName, JTextField entryField) {
         JPanel entryPanel = new JPanel();
-        entryPanel.setBackground(Color.LIGHT_GRAY);
+        entryPanel.setBackground(Color.DARK_GRAY);
         JLabel entryLabel = new JLabel(fieldName);
         entryLabel.setPreferredSize(new Dimension(100, 20));
         entryField.setPreferredSize(new Dimension(200, 20));

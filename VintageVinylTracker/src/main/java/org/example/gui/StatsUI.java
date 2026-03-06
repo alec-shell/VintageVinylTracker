@@ -9,12 +9,14 @@ import java.awt.*;
 
 public class StatsUI extends JPanel {
     private GenerateStats collectionStats;
+    private AsyncCalls asyncCalls;
 
 
-    public StatsUI(GenerateStats collectionStats) {
+    public StatsUI(GenerateStats collectionStats, AsyncCalls asyncCalls) {
         this.collectionStats = collectionStats;
+        this.asyncCalls = asyncCalls;
         this.setLayout(new BorderLayout());
-        this.setBackground(Color.LIGHT_GRAY);
+        this.setBackground(Color.DARK_GRAY);
         buildPanel();
         if (collectionStats.isUpdating()) {
             updateStats();
@@ -28,7 +30,7 @@ public class StatsUI extends JPanel {
 
     private JPanel buildAlbumsDisplay() {
         JPanel displayPanel = new JPanel();
-        displayPanel.setBackground(Color.LIGHT_GRAY);
+        displayPanel.setBackground(Color.DARK_GRAY);
         displayPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
@@ -41,8 +43,8 @@ public class StatsUI extends JPanel {
                 collectionStats.getMostValuableRecord().getThumbUrl() : "";
         String leastValUrl = collectionStats.getLeastValuableRecord() != null ?
                 collectionStats.getLeastValuableRecord().getThumbUrl() : "";
-        AsyncCalls.asyncThumbnailCall(mostValUrl, mostValuableArtwork);
-        AsyncCalls.asyncThumbnailCall(leastValUrl, leastValuableArtwork);
+        asyncCalls.asyncThumbnailCall(mostValUrl, mostValuableArtwork);
+        asyncCalls.asyncThumbnailCall(leastValUrl, leastValuableArtwork);
         displayPanel.add(buildAlbumContainer(collectionStats.getMostValuableRecord(), "Most Valuable: ",  mostValuableArtwork),  c);
         c.gridx = 2;
         displayPanel.add(buildAlbumContainer(collectionStats.getLeastValuableRecord(), "Least Valuable: ", leastValuableArtwork), c);
@@ -51,7 +53,7 @@ public class StatsUI extends JPanel {
 
     private JPanel buildAlbumContainer(Record record, String title, JLabel artwork) {
         JPanel container = new JPanel();
-        container.setBackground(Color.LIGHT_GRAY);
+        container.setBackground(Color.DARK_GRAY);
         container.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
         container.setLayout(new BorderLayout());
         if (record != null) {
