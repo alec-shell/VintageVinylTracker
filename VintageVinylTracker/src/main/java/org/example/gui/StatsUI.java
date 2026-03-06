@@ -14,7 +14,7 @@ public class StatsUI extends JPanel {
     public StatsUI(GenerateStats collectionStats) {
         this.collectionStats = collectionStats;
         this.setLayout(new BorderLayout());
-        this.setBackground(Color.LIGHT_GRAY);
+        this.setBackground(Color.DARK_GRAY);
         buildPanel();
         if (collectionStats.isUpdating()) {
             updateStats();
@@ -28,7 +28,7 @@ public class StatsUI extends JPanel {
 
     private JPanel buildAlbumsDisplay() {
         JPanel displayPanel = new JPanel();
-        displayPanel.setBackground(Color.LIGHT_GRAY);
+        displayPanel.setBackground(Color.DARK_GRAY);
         displayPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
@@ -51,7 +51,7 @@ public class StatsUI extends JPanel {
 
     private JPanel buildAlbumContainer(Record record, String title, JLabel artwork) {
         JPanel container = new JPanel();
-        container.setBackground(Color.LIGHT_GRAY);
+        container.setBackground(Color.DARK_GRAY);
         container.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
         container.setLayout(new BorderLayout());
         if (record != null) {

@@ -48,7 +48,7 @@ public class DBSearchUI extends JPanel {
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         dbTable = new JTable(model);
         addTableListener();
-        this.setBackground(Color.LIGHT_GRAY);
+        this.setBackground(Color.DARK_GRAY);
         this.setLayout(new BorderLayout());
         this.add(buildUIPanel(), BorderLayout.NORTH);
         this.add(new JScrollPane(dbTable), BorderLayout.CENTER);
@@ -79,7 +79,7 @@ public class DBSearchUI extends JPanel {
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
-        temp.setBackground(Color.LIGHT_GRAY);
+        temp.setBackground(Color.DARK_GRAY);
         temp.add(buildAlbumInfoDisplay(), c);
         c.gridx = 1;
         temp.add(buildSearchEntryForm(), c);
@@ -111,7 +111,7 @@ public class DBSearchUI extends JPanel {
 
     private JPanel buildAlbumInfoDisplay() {
         JPanel albumInfoPanel = new JPanel();
-        albumInfoPanel.setBackground(Color.LIGHT_GRAY);
+        albumInfoPanel.setBackground(Color.DARK_GRAY);
         albumInfoPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -130,7 +130,7 @@ public class DBSearchUI extends JPanel {
 
     private JPanel buildSearchEntryForm() {
         JPanel searchEntryForm = new JPanel();
-        searchEntryForm.setBackground(Color.LIGHT_GRAY);
+        searchEntryForm.setBackground(Color.DARK_GRAY);
         searchEntryForm.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -163,16 +163,16 @@ public class DBSearchUI extends JPanel {
 
     private JPanel buildOwnedSelectorPanel() {
         JPanel ownedSelectorPanel = new JPanel();
-        ownedSelectorPanel.setBackground(Color.LIGHT_GRAY);
+        ownedSelectorPanel.setBackground(Color.DARK_GRAY);
         JRadioButton owned = new JRadioButton("Show Owned");
         owned.setActionCommand("true");
-        owned.setBackground(Color.LIGHT_GRAY);
+        owned.setBackground(Color.DARK_GRAY);
         JRadioButton wanted = new JRadioButton("Show Wanted");
         wanted.setActionCommand("false");
-        wanted.setBackground(Color.LIGHT_GRAY);
+        wanted.setBackground(Color.DARK_GRAY);
         JRadioButton all =  new JRadioButton("Show All");
         all.setActionCommand("null");
-        all.setBackground(Color.LIGHT_GRAY);
+        all.setBackground(Color.DARK_GRAY);
         all.setSelected(true);
         ownedBtnGroup.add(owned);
         ownedBtnGroup.add(wanted);
@@ -194,7 +194,7 @@ public class DBSearchUI extends JPanel {
 
     private JPanel getEntryField(String fieldName, JTextField entryField) {
         JPanel entryPanel = new JPanel();
-        entryPanel.setBackground(Color.LIGHT_GRAY);
+        entryPanel.setBackground(Color.DARK_GRAY);
         JLabel entryLabel = new JLabel(fieldName);
         entryLabel.setPreferredSize(new Dimension(100, 20));
         entryField.setPreferredSize(new Dimension(200, 20));

@@ -76,7 +76,7 @@ public class DiscogsUI extends JPanel {
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
-        temp.setBackground(Color.LIGHT_GRAY);
+        temp.setBackground(Color.DARK_GRAY);
         temp.add(buildAlbumInfoDisplay(), c);
         c.gridx = 1;
         temp.add(buildSearchEntryForm(), c);
@@ -168,7 +168,7 @@ public class DiscogsUI extends JPanel {
 
     private JPanel buildAlbumInfoDisplay() {
         JPanel albumInfoPanel = new JPanel();
-        albumInfoPanel.setBackground(Color.LIGHT_GRAY);
+        albumInfoPanel.setBackground(Color.DARK_GRAY);
         albumInfoPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -187,7 +187,7 @@ public class DiscogsUI extends JPanel {
 
     private JPanel buildSearchEntryForm() {
         JPanel searchEntryForm = new JPanel();
-        searchEntryForm.setBackground(Color.LIGHT_GRAY);
+        searchEntryForm.setBackground(Color.DARK_GRAY);
         searchEntryForm.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -250,7 +250,7 @@ public class DiscogsUI extends JPanel {
 
     private JPanel getEntryField(String fieldName, JTextField entryField) {
         JPanel entryPanel = new JPanel();
-        entryPanel.setBackground(Color.LIGHT_GRAY);
+        entryPanel.setBackground(Color.DARK_GRAY);
         JLabel entryLabel = new JLabel(fieldName);
         entryLabel.setPreferredSize(new Dimension(100, 20));
         entryField.setPreferredSize(new Dimension(200, 20));

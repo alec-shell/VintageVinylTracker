@@ -7,7 +7,7 @@
 package org.example;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
 import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.Keyring;
 import org.example.client.AuthorizationClient;
@@ -146,7 +146,7 @@ public class Main extends JFrame {
     } // asyncAuthCheck()
 
     public static void main(String[] args) {
-        FlatLightLaf.setup();
+        FlatDarkLaf.setup();
         JFrame frame = new Main();
         frame.setVisible(true);
     } // main()
