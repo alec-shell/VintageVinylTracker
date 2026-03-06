@@ -121,11 +121,6 @@ public class Main extends JFrame {
                 "Authorization Error", JOptionPane.ERROR_MESSAGE);
     } // errorOptionPane()
 
-    public static void main(String[] args) {
-        JFrame frame = new Main();
-        frame.setVisible(true);
-    } // main()
-
     private void asyncAuthCheck() {
         SwingWorker<Boolean, Void> worker = new SwingWorker() {
 
@@ -149,4 +144,9 @@ public class Main extends JFrame {
         worker.execute();
     } // asyncAuthCheck()
 
+        public static void main(String[] args) {
+        JFrame frame = new Main();
+        frame.setVisible(true);
+    } // main()
+        
 } // TrackerUI class
