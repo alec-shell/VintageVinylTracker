@@ -166,10 +166,13 @@ public class DBSearchUI extends JPanel {
         ownedSelectorPanel.setBackground(Color.LIGHT_GRAY);
         JRadioButton owned = new JRadioButton("Show Owned");
         owned.setActionCommand("true");
+        owned.setBackground(Color.LIGHT_GRAY);
         JRadioButton wanted = new JRadioButton("Show Wanted");
         wanted.setActionCommand("false");
+        wanted.setBackground(Color.LIGHT_GRAY);
         JRadioButton all =  new JRadioButton("Show All");
         all.setActionCommand("null");
+        all.setBackground(Color.LIGHT_GRAY);
         all.setSelected(true);
         ownedBtnGroup.add(owned);
         ownedBtnGroup.add(wanted);
