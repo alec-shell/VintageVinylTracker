@@ -35,13 +35,17 @@ public class DiscogsUI extends JPanel {
     private final DBAccess dbAccess;
     private final GenerateStats collectionStats;
     private final EventTriggers eventTriggers;
+    private final AsyncCalls asyncCalls;
     private ArrayList<Record> records;
 
-    public DiscogsUI(ProxyClient proxyClient, DBAccess dbAccess, GenerateStats collectionStats, EventTriggers eventTriggers) {
+    public DiscogsUI(ProxyClient proxyClient, DBAccess dbAccess, 
+            GenerateStats collectionStats, EventTriggers eventTriggers,
+            AsyncCalls asyncCalls) {
         this.proxyClient = proxyClient;
         this.dbAccess = dbAccess;
         this.collectionStats = collectionStats;
         this.eventTriggers = eventTriggers;
+        this.asyncCalls = asyncCalls;
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         this.setLayout(new BorderLayout());
         JPanel UIPanel = buildUIPanel();
@@ -57,8 +61,8 @@ public class DiscogsUI extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 int rowIndex = discogsTable.getSelectedRow();
                 if (records == null || records.size() <= rowIndex) { return; }
-                AsyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel);
-                AsyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel);
+                asyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel);
+                asyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel);
             }
             @Override
             public void mousePressed(MouseEvent e) {}
@@ -175,7 +179,7 @@ public class DiscogsUI extends JPanel {
         c.insets = new Insets(5, 5, 5, 5);
         int gridxCounter = 0;
         c.gridy = 0;
-        albumArtLabel = new JLabel(AsyncCalls.defaultThumbNail);
+        albumArtLabel = new JLabel(asyncCalls.defaultThumbNail);
         albumArtLabel.setPreferredSize(new Dimension(AsyncCalls.albumArtWidth, AsyncCalls.albumArtHeight));
         c.gridx = gridxCounter++;
         albumInfoPanel.add(albumArtLabel, c);
@@ -220,7 +224,7 @@ public class DiscogsUI extends JPanel {
         String album = !albumNameJTF.getText().isBlank() ? albumNameJTF.getText() : null;
         String year = !yearJTF.getText().isBlank() ? yearJTF.getText() : null;
         String catNo = !catNoJTF.getText().isBlank() ? catNoJTF.getText() : null;
-        albumArtLabel.setIcon(AsyncCalls.defaultThumbNail);
+        albumArtLabel.setIcon(asyncCalls.defaultThumbNail);
         pricingInfoLabel.setText("");
         if (artist == null && album == null && year == null && catNo == null) {
             pricingInfoLabel.setText("Please fill out at least one form field.");

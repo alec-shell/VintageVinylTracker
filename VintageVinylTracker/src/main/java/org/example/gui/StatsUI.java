@@ -9,10 +9,12 @@ import java.awt.*;
 
 public class StatsUI extends JPanel {
     private GenerateStats collectionStats;
+    private AsyncCalls asyncCalls;
 
 
-    public StatsUI(GenerateStats collectionStats) {
+    public StatsUI(GenerateStats collectionStats, AsyncCalls asyncCalls) {
         this.collectionStats = collectionStats;
+        this.asyncCalls = asyncCalls;
         this.setLayout(new BorderLayout());
         this.setBackground(Color.DARK_GRAY);
         buildPanel();
@@ -41,8 +43,8 @@ public class StatsUI extends JPanel {
                 collectionStats.getMostValuableRecord().getThumbUrl() : "";
         String leastValUrl = collectionStats.getLeastValuableRecord() != null ?
                 collectionStats.getLeastValuableRecord().getThumbUrl() : "";
-        AsyncCalls.asyncThumbnailCall(mostValUrl, mostValuableArtwork);
-        AsyncCalls.asyncThumbnailCall(leastValUrl, leastValuableArtwork);
+        asyncCalls.asyncThumbnailCall(mostValUrl, mostValuableArtwork);
+        asyncCalls.asyncThumbnailCall(leastValUrl, leastValuableArtwork);
         displayPanel.add(buildAlbumContainer(collectionStats.getMostValuableRecord(), "Most Valuable: ",  mostValuableArtwork),  c);
         c.gridx = 2;
         displayPanel.add(buildAlbumContainer(collectionStats.getLeastValuableRecord(), "Least Valuable: ", leastValuableArtwork), c);

@@ -38,13 +38,16 @@ public class DBSearchUI extends JPanel {
     private JLabel albumArtLabel;
     private final JLabel pricingInfoLabel = new JLabel();
     private final ProxyClient proxyClient;
+    private final AsyncCalls asyncCalls;
 
     public DBSearchUI(ProxyClient proxyClient, DBAccess dbAccess,
-                      GenerateStats collectionStats, EventTriggers eventTriggers) {
+                      GenerateStats collectionStats, EventTriggers eventTriggers,
+                      AsyncCalls asyncCalls) {
         this.dbAccess = dbAccess;
         this.proxyClient = proxyClient;
         this.collectionStats = collectionStats;
         this.eventTriggers = eventTriggers;
+        this.asyncCalls = asyncCalls;
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         dbTable = new JTable(model);
         addTableListener();
@@ -60,8 +63,8 @@ public class DBSearchUI extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 int rowIndex = dbTable.getSelectedRow();
                 if (records == null || records.size() <= rowIndex) { return; }
-                AsyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel);
-                AsyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel);
+                asyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel);
+                asyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel);
             }
             @Override
             public void mousePressed(MouseEvent e) {}
@@ -98,7 +101,7 @@ public class DBSearchUI extends JPanel {
         if (deleted) {
             records.remove(selectedIndex);
             updateResultsDisplay(records);
-            albumArtLabel.setIcon(AsyncCalls.defaultThumbNail);
+            albumArtLabel.setIcon(asyncCalls.defaultThumbNail);
             pricingInfoLabel.setText("");
             collectionStats.parseOwnedAlbums();
             eventTriggers.updateStatsUI();
@@ -118,7 +121,7 @@ public class DBSearchUI extends JPanel {
         c.insets = new Insets(5, 5, 5, 5);
         int gridxCounter = 0;
         c.gridy = 0;
-        albumArtLabel = new JLabel(AsyncCalls.defaultThumbNail);
+        albumArtLabel = new JLabel(asyncCalls.defaultThumbNail);
         albumArtLabel.setPreferredSize(new Dimension(AsyncCalls.albumArtWidth, AsyncCalls.albumArtHeight));
         c.gridx = gridxCounter++;
         albumInfoPanel.add(albumArtLabel, c);

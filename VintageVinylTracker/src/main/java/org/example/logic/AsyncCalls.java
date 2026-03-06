@@ -11,11 +11,12 @@ import java.util.concurrent.ExecutionException;
 public class AsyncCalls {
     public static final int albumArtWidth = 180;
     public static final int albumArtHeight = 180;
-    public static final Image scaledDefaultThumbNail = new ImageIcon("VintageVinylTracker/img/defaultThumbnail.jpg")
+    public final URL defaultURL = getClass().getResource("/img/defaultThumbnail.jpg");
+    public Image scaledDefaultThumbNail = new ImageIcon(defaultURL)
             .getImage().getScaledInstance(albumArtWidth, albumArtHeight, Image.SCALE_SMOOTH);
-    public static final ImageIcon defaultThumbNail = new ImageIcon(scaledDefaultThumbNail);
+    public final ImageIcon defaultThumbNail = new ImageIcon(scaledDefaultThumbNail);
 
-    public static void asyncPricingCall(ProxyClient proxyClient, int id, JLabel label) {
+    public void asyncPricingCall(ProxyClient proxyClient, int id, JLabel label) {
         SwingWorker<String, Void> worker = new SwingWorker<>() {
 
             @Override
@@ -35,7 +36,7 @@ public class AsyncCalls {
         worker.execute();
     } // asyncPricingCall()
 
-    public static void asyncThumbnailCall(String thumbUrl, JLabel label) {
+    public void asyncThumbnailCall(String thumbUrl, JLabel label) {
         SwingWorker<ImageIcon, Void> worker = new SwingWorker<>() {
             @Override
             protected ImageIcon doInBackground() throws Exception {
