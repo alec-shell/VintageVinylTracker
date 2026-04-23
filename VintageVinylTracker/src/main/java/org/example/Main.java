@@ -24,7 +24,7 @@ import java.net.http.HttpClient;
 import java.time.Duration;
 
 
-public class Main extends JFrame {
+public class Main {
     AuthorizationClient authorizationClient;
 
     public Main() {
@@ -42,6 +42,7 @@ public class Main extends JFrame {
         }
         try {
             UIManager.setLookAndFeel(new FlatDarkLaf());
+            UIManager.put("Label.font", new Font("Arial", Font.BOLD, 13));
         } catch (UnsupportedLookAndFeelException e) {
             System.out.println("Could not set look and feel");
         }

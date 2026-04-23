@@ -120,10 +120,10 @@ public class DiscogsUI extends JPanel {
                 price = Double.parseDouble(JOptionPane.showInputDialog(this,
                         "Purchase Price: "));
             } catch (NumberFormatException e) {
-                JOptionPane.showConfirmDialog(this,
+                JOptionPane.showMessageDialog(this,
                         "Invalid price entry",
                         "Error: ",
-                        JOptionPane.OK_OPTION);
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
         selected.setPurchasePrice(price);
@@ -219,9 +219,15 @@ public class DiscogsUI extends JPanel {
         JButton submit =  new JButton("Search");
         c.gridy = gridyCounter;
         searchEntryForm.add(submit, c);
-        submit.addActionListener(_ -> searchDiscogs());
+        submit.addActionListener(_ -> submitActionListener());
         return searchEntryForm;
     } // buildSearchEntryForm()
+
+    private void submitActionListener() {
+        searchDiscogs();
+        albumArtLabel.setIcon(asyncCalls.defaultThumbNail);
+        pricingInfoLabel.setText("");
+    } // submitActionListener()
 
     private void searchDiscogs() {
         String artist = !artistNameJTF.getText().isBlank() ? artistNameJTF.getText() : null;

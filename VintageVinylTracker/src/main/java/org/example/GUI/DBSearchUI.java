@@ -192,13 +192,19 @@ public class DBSearchUI extends JPanel {
     } // ownedRadioSelector
 
     private void submitActionListener() {
+        searchDB();
+        albumArtLabel.setIcon(asyncCalls.defaultThumbNail);
+        pricingInfoLabel.setText("");
+    }// submitActionListener()
+
+    private void searchDB() {
         String artist = !artistNameJTF.getText().isBlank() ? artistNameJTF.getText() : null;
         String album = !albumNameJTF.getText().isBlank() ? albumNameJTF.getText() : null;
         String year = !yearJTF.getText().isBlank() ? yearJTF.getText() : null;
         String catNo = !catNoJTF.getText().isBlank() ? catNoJTF.getText() : null;
         records = dbAccess.searchRecordEntries(artist, album, year, catNo, ownedBtnGroup.getSelection().getActionCommand());
         updateResultsDisplay(records);
-    } // submitActionListener()
+    } // searchDB()
 
     private JPanel getEntryField(String fieldName, JTextField entryField) {
         JPanel entryPanel = new JPanel();

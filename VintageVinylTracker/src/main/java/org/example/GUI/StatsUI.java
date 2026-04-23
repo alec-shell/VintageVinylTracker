@@ -8,9 +8,8 @@ import javax.swing.*;
 import java.awt.*;
 
 public class StatsUI extends JPanel {
-    private GenerateStats collectionStats;
-    private AsyncCalls asyncCalls;
-
+    private final GenerateStats collectionStats;
+    private final AsyncCalls asyncCalls;
 
     public StatsUI(GenerateStats collectionStats, AsyncCalls asyncCalls) {
         this.collectionStats = collectionStats;

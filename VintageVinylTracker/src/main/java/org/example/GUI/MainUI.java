@@ -22,7 +22,6 @@ public class MainUI extends JFrame {
     private boolean sessionAuth = false;
     private final AuthorizationClient authorizationClient;
 
-
     public MainUI(GenerateStats collectionStats, ProxyClient proxyClient,
                   DBAccess dbAccess, AuthorizationClient authorizationClient,
                   AsyncCalls asyncCalls, EventTriggers eventTriggers) {
@@ -90,17 +89,17 @@ public class MainUI extends JFrame {
     } // errorOptionPane()
 
     private void asyncAuthCheck() {
-        SwingWorker<Boolean, Void> worker = new SwingWorker() {
+        SwingWorker<Boolean, Void> worker = new SwingWorker<>() {
 
             @Override
-            protected Boolean doInBackground() throws Exception {
+            protected Boolean doInBackground() {
                 return authorizationClient.hasAuthorization();
             } // doInBackground()
 
             @Override
             protected void done() {
                 try {
-                    if ((Boolean) get() == false) {
+                    if (get() == false) {
                         spawnAuthorizationInput();
                     }
                     else sessionAuth = true;
