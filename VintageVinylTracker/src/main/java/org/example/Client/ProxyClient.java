@@ -1,11 +1,11 @@
-package org.example.client;
+package org.example.Client;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import org.example.DTO.PricingRequest;
 import org.example.DTO.SearchRequest;
-import org.example.config.URIConfig;
+import org.example.Config.URIConfig;
 
 import java.io.IOException;
 import java.net.http.HttpClient;

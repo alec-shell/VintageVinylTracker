@@ -1,6 +1,6 @@
-package org.example.logic;
+package org.example.Logic;
 
-import org.example.client.ProxyClient;
+import org.example.Client.ProxyClient;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

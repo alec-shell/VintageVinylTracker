@@ -1,4 +1,4 @@
-package org.example.config;
+package org.example.Config;
 
 import java.net.URI;
 

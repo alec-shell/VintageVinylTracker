@@ -1,11 +1,11 @@
-package org.example.gui;
+package org.example.GUI;
 
-import org.example.client.ProxyClient;
-import org.example.logic.Record;
-import org.example.logic.AsyncCalls;
-import org.example.logic.DBAccess;
-import org.example.logic.EventTriggers;
-import org.example.logic.GenerateStats;
+import org.example.Client.ProxyClient;
+import org.example.Logic.Record;
+import org.example.Logic.AsyncCalls;
+import org.example.Logic.DBAccess;
+import org.example.Logic.EventTriggers;
+import org.example.Logic.GenerateStats;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

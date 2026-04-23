@@ -1,8 +1,8 @@
-package org.example.gui;
+package org.example.GUI;
 
-import org.example.logic.AsyncCalls;
-import org.example.logic.GenerateStats;
-import org.example.logic.Record;
+import org.example.Logic.AsyncCalls;
+import org.example.Logic.GenerateStats;
+import org.example.Logic.Record;
 
 import javax.swing.*;
 import java.awt.*;

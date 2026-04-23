@@ -10,148 +10,56 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.Keyring;
-import org.example.client.AuthorizationClient;
-import org.example.client.ProxyClient;
-import org.example.gui.DBSearchUI;
-import org.example.gui.DiscogsUI;
-import org.example.gui.StatsUI;
-import org.example.logic.DBAccess;
-import org.example.logic.EventTriggers;
-import org.example.logic.GenerateStats;
+import org.example.Client.AuthorizationClient;
+import org.example.Client.ProxyClient;
+import org.example.GUI.MainUI;
+import org.example.Logic.AsyncCalls;
+import org.example.Logic.DBAccess;
+import org.example.Logic.EventTriggers;
+import org.example.Logic.GenerateStats;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.time.Duration;
-import java.util.concurrent.ExecutionException;
-import org.example.logic.AsyncCalls;
 
 
 public class Main extends JFrame {
-    private final DBAccess dbAccess;
-    private JTabbedPane tabsPane;
-    private final DBSearchUI dbSearchUI;
-    private final DiscogsUI discogsUI;
-    private final StatsUI statsUI;
     AuthorizationClient authorizationClient;
-    private final GenerateStats collectionStats;
-    private final EventTriggers eventTriggers;
-    private final HttpClient  httpClient;
-    private final Keyring keyRing;
-    private final ProxyClient proxyClient;
-    private final AsyncCalls asyncCalls;
-    private final JsonMapper mapper =  new JsonMapper();
-    private boolean sessionAuth = false;
 
     public Main() {
-        this.setTitle("Vintage Vinyl");
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(1000, 600);
-        this.setLayout(new BorderLayout());
-        this.asyncCalls = new AsyncCalls();
-        this.httpClient = HttpClient
+        HttpClient httpClient = HttpClient
                 .newBuilder()
                 .version(HttpClient.Version.HTTP_2)
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .connectTimeout(Duration.ofSeconds(20))
                 .build();
+        Keyring keyRing;
         try {
-            this.keyRing = Keyring.create();
+            keyRing = Keyring.create();
         } catch (BackendNotSupportedException e) {
             throw new RuntimeException(e);
         }
+        try {
+            UIManager.setLookAndFeel(new FlatDarkLaf());
+        } catch (UnsupportedLookAndFeelException e) {
+            System.out.println("Could not set look and feel");
+        }
+        JsonMapper mapper = new JsonMapper();
         this.authorizationClient = new AuthorizationClient(httpClient, keyRing, mapper);
-        this.proxyClient = new ProxyClient(httpClient, keyRing, mapper);
-        this.dbAccess = new DBAccess();
-        this.collectionStats = new GenerateStats(proxyClient, dbAccess, mapper);
-        this.statsUI = new StatsUI(collectionStats, asyncCalls);
-        this.eventTriggers = new EventTriggers(statsUI);
-        this.dbSearchUI = new DBSearchUI(proxyClient, dbAccess, collectionStats,  eventTriggers, asyncCalls);
-        this.discogsUI = new DiscogsUI(proxyClient, dbAccess, collectionStats, eventTriggers, asyncCalls);
-        buildTabbedPane();
-        this.add(tabsPane, BorderLayout.CENTER);
+        ProxyClient proxyClient = new ProxyClient(httpClient, keyRing, mapper);
+        DBAccess dbAccess = new DBAccess();
+        GenerateStats collectionStats = new GenerateStats(proxyClient, dbAccess, mapper);
+        AsyncCalls asyncCalls = new AsyncCalls();
+        EventTriggers eventTriggers = new EventTriggers();
+        MainUI mainUI = new MainUI(collectionStats, proxyClient, dbAccess,
+                authorizationClient, asyncCalls, eventTriggers);
+        mainUI.setVisible(true);
     } // constructor
 
-    private void buildTabbedPane() {
-        tabsPane = new JTabbedPane(JTabbedPane.LEFT);
-        tabsPane.add("Stats", statsUI);
-        tabsPane.add("Discogs", discogsUI);
-        tabsPane.add("Search Database",  dbSearchUI);
-        addTabListener();
-    } // buildTabbedPane()
-
-    private void addTabListener() {
-        tabsPane.addChangeListener(_ -> {
-            String tabTitle = tabsPane.getTitleAt(tabsPane.getSelectedIndex());
-            if (tabTitle.equals("Discogs") && !sessionAuth) {
-                asyncAuthCheck();
-            }
-        });
-    } // addTabListener()
-
-    private void spawnAuthorizationInput() {
-        int authBoxChoice = JOptionPane.showConfirmDialog(this,
-                "Sync your discogs account?",
-                "Discogs Account Sync",
-                JOptionPane.YES_NO_OPTION);
-        if (authBoxChoice == JOptionPane.YES_OPTION) {
-            try {
-                authorizationClient.getRequestToken();
-                authorizationClient.getAuthorizationURL();
-                Desktop.getDesktop().browse(new URI(authorizationClient.getURL()));
-                String verifier = JOptionPane.showInputDialog("Enter verification code below:");
-                if (verifier != null && !verifier.isEmpty()) {
-                    try {
-                        authorizationClient.getUserToken(verifier);
-                        if (authorizationClient.hasAuthorization()) {
-                            sessionAuth = true;
-                            JOptionPane.showMessageDialog(this, "Discogs Account Sync Successful!");
-                        }
-                    } catch (IOException | InterruptedException e) {
-                        errorOptionPane(e.getMessage());
-                    }
-                }
-            } catch (IOException | InterruptedException | URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    } // spawnAuthorizationInput()
-
-    private void errorOptionPane(String message) {
-        JOptionPane.showMessageDialog(this, "Could not connect to Discogs: " + message,
-                "Authorization Error", JOptionPane.ERROR_MESSAGE);
-    } // errorOptionPane()
-
-    private void asyncAuthCheck() {
-        SwingWorker<Boolean, Void> worker = new SwingWorker() {
-
-            @Override
-            protected Boolean doInBackground() throws Exception {
-                return authorizationClient.hasAuthorization();
-            } // doInBackground()
-
-            @Override
-            protected void done() {
-                try {
-                    if ((Boolean) get() == false) {
-                        spawnAuthorizationInput();
-                    }
-                    else sessionAuth = true;
-                } catch (InterruptedException | ExecutionException e) {
-                    throw new RuntimeException(e);
-                }
-            } // done()
-        };
-        worker.execute();
-    } // asyncAuthCheck()
 
     public static void main(String[] args) {
-        FlatDarkLaf.setup();
-        JFrame frame = new Main();
-        frame.setVisible(true);
+        Main main = new Main();
     } // main()
         
 } // TrackerUI class

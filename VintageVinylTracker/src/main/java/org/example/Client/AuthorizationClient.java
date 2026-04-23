@@ -1,4 +1,4 @@
-package org.example.client;
+package org.example.Client;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -7,7 +7,7 @@ import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import org.example.DTO.AuthTokenRequest;
 import org.example.DTO.URLRequest;
-import org.example.config.URIConfig;
+import org.example.Config.URIConfig;
 
 import java.io.IOException;
 import java.net.http.HttpClient;

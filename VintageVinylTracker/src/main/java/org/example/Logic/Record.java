@@ -2,7 +2,7 @@
  * Record.java: Record class.
  */
 
-package org.example.logic;
+package org.example.Logic;
 
 
 public class Record {

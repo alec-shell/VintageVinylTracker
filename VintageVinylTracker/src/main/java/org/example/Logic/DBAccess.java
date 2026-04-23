@@ -4,7 +4,7 @@
  * 11/26/2025
  */
 
-package org.example.logic;
+package org.example.Logic;
 
 import java.sql.*;
 import java.time.LocalDate;

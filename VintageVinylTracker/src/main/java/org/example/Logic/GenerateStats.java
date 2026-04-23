@@ -1,9 +1,9 @@
-package org.example.logic;
+package org.example.Logic;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import org.example.client.ProxyClient;
+import org.example.Client.ProxyClient;
 
 import java.util.ArrayList;
 import java.util.List;
