@@ -10,6 +10,8 @@ import org.example.Logic.ParseAPIResponse;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -46,11 +48,13 @@ public class DiscogsUI extends JPanel {
         this.collectionStats = collectionStats;
         this.eventTriggers = eventTriggers;
         this.asyncCalls = asyncCalls;
-        DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         this.setLayout(new BorderLayout());
         JPanel UIPanel = buildUIPanel();
         this.add(UIPanel, BorderLayout.NORTH);
+        TableModel model = new DefaultTableModel(columnNames, 0);
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(model);
         discogsTable = new JTable(model);
+        discogsTable.setRowSorter(sorter);
         addTableListener();
         this.add(new JScrollPane(discogsTable), BorderLayout.CENTER);
     } // constructor
@@ -238,7 +242,6 @@ public class DiscogsUI extends JPanel {
         if (records.isEmpty()) {
             pricingInfoLabel.setText("No results found.");
             model.addRow(new String[]{"NO RESULTS", "NO RESULTS", "NO RESULTS", "NO RESULTS", "NO RESULTS"});
-
         }
         else {
             for (Record record : records) {

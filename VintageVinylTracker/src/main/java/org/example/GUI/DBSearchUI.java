@@ -9,6 +9,8 @@ import org.example.Logic.GenerateStats;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -48,13 +50,16 @@ public class DBSearchUI extends JPanel {
         this.collectionStats = collectionStats;
         this.eventTriggers = eventTriggers;
         this.asyncCalls = asyncCalls;
-        DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+        TableModel model = new DefaultTableModel(columnNames, 0);
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>(model);
         dbTable = new JTable(model);
+        dbTable.setRowSorter(sorter);
         addTableListener();
         this.setBackground(Color.DARK_GRAY);
         this.setLayout(new BorderLayout());
         this.add(buildUIPanel(), BorderLayout.NORTH);
         this.add(new JScrollPane(dbTable), BorderLayout.CENTER);
+        submitActionListener();
     } // constructor
 
     private void addTableListener() {
