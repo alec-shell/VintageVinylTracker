@@ -1,6 +1,7 @@
 package org.example.GUI;
 
 import org.example.Client.ProxyClient;
+import org.example.Config.Constants;
 import org.example.Logic.Record;
 import org.example.Logic.AsyncCalls;
 import org.example.Logic.DBAccess;
@@ -13,8 +14,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 
@@ -24,13 +23,6 @@ public class DiscogsUI extends JPanel {
     private final JTextField albumNameJTF =  new JTextField();
     private final JTextField yearJTF = new JTextField();
     private final JTextField catNoJTF =  new JTextField();
-    private final String[] columnNames = {
-            "Catalog No.",
-            "Artist",
-            "Album",
-            "Year",
-            "Country"
-    };
     private JLabel albumArtLabel;
     private final JLabel pricingInfoLabel = new JLabel();
     private final ProxyClient proxyClient;
@@ -51,7 +43,7 @@ public class DiscogsUI extends JPanel {
         this.setLayout(new BorderLayout());
         JPanel UIPanel = buildUIPanel();
         this.add(UIPanel, BorderLayout.NORTH);
-        TableModel model = new DefaultTableModel(columnNames, 0);
+        TableModel model = new DefaultTableModel(Constants.discogsColumnNames, 0);
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(model);
         discogsTable = new JTable(model);
         discogsTable.setRowSorter(sorter);
@@ -60,22 +52,12 @@ public class DiscogsUI extends JPanel {
     } // constructor
 
     private void addTableListener() {
-        discogsTable.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                int rowIndex = discogsTable.getSelectedRow();
-                if (records == null || records.size() <= rowIndex) { return; }
-                asyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel);
-                asyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel);
-            }
-            @Override
-            public void mousePressed(MouseEvent e) {}
-            @Override
-            public void mouseReleased(MouseEvent e) {}
-            @Override
-            public void mouseEntered(MouseEvent e) {}
-            @Override
-            public void mouseExited(MouseEvent e) {}
+        discogsTable.getSelectionModel().addListSelectionListener(e -> {
+            if (e.getValueIsAdjusting()) return;
+            int rowIndex = discogsTable.convertRowIndexToModel(discogsTable.getSelectedRow());
+
+            asyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel);
+            asyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel);
         });
     } // addTableListener()
 
@@ -84,7 +66,7 @@ public class DiscogsUI extends JPanel {
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
-        temp.setBackground(Color.DARK_GRAY);
+        temp.setBackground(Constants.bgColor);
         temp.add(buildAlbumInfoDisplay(), c);
         c.gridx = 1;
         temp.add(buildSearchEntryForm(), c);
@@ -133,12 +115,12 @@ public class DiscogsUI extends JPanel {
                         "Condition",
                         JOptionPane.QUESTION_MESSAGE,
                         null,
-                        ParseAPIResponse.conditions,
-                        ParseAPIResponse.conditions[0]
+                        Constants.pricingConditions,
+                        Constants.pricingConditions[0]
         );
         selected.setCondition(condition);
-        for (int i = 0; i < ParseAPIResponse.conditions.length; i++) {
-            if (condition.equals(ParseAPIResponse.conditions[i])) {
+        for (int i = 0; i < Constants.pricingConditions.length; i++) {
+            if (condition.equals(Constants.pricingConditions[i])) {
                 selected.setValue(ParseAPIResponse.selectionPrices[i]);
             }
         }
@@ -176,15 +158,15 @@ public class DiscogsUI extends JPanel {
 
     private JPanel buildAlbumInfoDisplay() {
         JPanel albumInfoPanel = new JPanel();
-        albumInfoPanel.setBackground(Color.DARK_GRAY);
+        albumInfoPanel.setBackground(Constants.bgColor);
         albumInfoPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.insets = new Insets(5, 5, 5, 5);
         int gridxCounter = 0;
         c.gridy = 0;
-        albumArtLabel = new JLabel(asyncCalls.defaultThumbNail);
-        albumArtLabel.setPreferredSize(new Dimension(AsyncCalls.albumArtWidth, AsyncCalls.albumArtHeight));
+        albumArtLabel = new JLabel(Constants.defaultThumbNail);
+        albumArtLabel.setPreferredSize(new Dimension(Constants.albumArtWidth, Constants.albumArtHeight));
         c.gridx = gridxCounter++;
         albumInfoPanel.add(albumArtLabel, c);
         c.gridx = gridxCounter;
@@ -195,7 +177,7 @@ public class DiscogsUI extends JPanel {
 
     private JPanel buildSearchEntryForm() {
         JPanel searchEntryForm = new JPanel();
-        searchEntryForm.setBackground(Color.DARK_GRAY);
+        searchEntryForm.setBackground(Constants.bgColor);
         searchEntryForm.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -225,7 +207,7 @@ public class DiscogsUI extends JPanel {
 
     private void submitActionListener() {
         searchDiscogs();
-        albumArtLabel.setIcon(asyncCalls.defaultThumbNail);
+        albumArtLabel.setIcon(Constants.defaultThumbNail);
         pricingInfoLabel.setText("");
     } // submitActionListener()
 
@@ -234,7 +216,7 @@ public class DiscogsUI extends JPanel {
         String album = !albumNameJTF.getText().isBlank() ? albumNameJTF.getText() : null;
         String year = !yearJTF.getText().isBlank() ? yearJTF.getText() : null;
         String catNo = !catNoJTF.getText().isBlank() ? catNoJTF.getText() : null;
-        albumArtLabel.setIcon(asyncCalls.defaultThumbNail);
+        albumArtLabel.setIcon(Constants.defaultThumbNail);
         pricingInfoLabel.setText("");
         if (artist == null && album == null && year == null && catNo == null) {
             pricingInfoLabel.setText("Please fill out at least one form field.");
@@ -263,7 +245,7 @@ public class DiscogsUI extends JPanel {
 
     private JPanel getEntryField(String fieldName, JTextField entryField) {
         JPanel entryPanel = new JPanel();
-        entryPanel.setBackground(Color.DARK_GRAY);
+        entryPanel.setBackground(Constants.bgColor);
         JLabel entryLabel = new JLabel(fieldName);
         entryLabel.setPreferredSize(new Dimension(100, 20));
         entryField.setPreferredSize(new Dimension(200, 20));

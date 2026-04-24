@@ -2,6 +2,7 @@ package org.example.GUI;
 
 import org.example.Client.AuthorizationClient;
 import org.example.Client.ProxyClient;
+import org.example.Config.Constants;
 import org.example.Logic.AsyncCalls;
 import org.example.Logic.DBAccess;
 import org.example.Logic.EventTriggers;
@@ -12,6 +13,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
 public class MainUI extends JFrame {
@@ -30,6 +32,8 @@ public class MainUI extends JFrame {
         this.setSize(1000, 600);
         this.setLayout(new BorderLayout());
         this.authorizationClient = authorizationClient;
+        final URL defaultURL = getClass().getResource(Constants.defaultIconImgPath);
+        setDefaultThumbNail(defaultURL);
         this.statsUI = new StatsUI(collectionStats, asyncCalls);
         eventTriggers.setStatsUI(statsUI);
         this.dbSearchUI = new DBSearchUI(proxyClient, dbAccess, collectionStats, eventTriggers, asyncCalls);
@@ -110,5 +114,11 @@ public class MainUI extends JFrame {
         };
         worker.execute();
     } // asyncAuthCheck()
+
+    private static void setDefaultThumbNail(URL url) {
+        Image scaledDefaultThumbNail = new ImageIcon(url)
+                .getImage().getScaledInstance(Constants.albumArtWidth, Constants.albumArtHeight, Image.SCALE_SMOOTH);
+        Constants.defaultThumbNail =  new ImageIcon(scaledDefaultThumbNail);
+    }
 
 }

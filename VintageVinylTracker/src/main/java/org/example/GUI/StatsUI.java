@@ -1,5 +1,6 @@
 package org.example.GUI;
 
+import org.example.Config.Constants;
 import org.example.Logic.AsyncCalls;
 import org.example.Logic.GenerateStats;
 import org.example.Logic.Record;
@@ -15,7 +16,7 @@ public class StatsUI extends JPanel {
         this.collectionStats = collectionStats;
         this.asyncCalls = asyncCalls;
         this.setLayout(new BorderLayout());
-        this.setBackground(Color.DARK_GRAY);
+        this.setBackground(Constants.bgColor);
         buildPanel();
         if (collectionStats.isUpdating()) {
             updateStats();
@@ -29,15 +30,15 @@ public class StatsUI extends JPanel {
 
     private JPanel buildAlbumsDisplay() {
         JPanel displayPanel = new JPanel();
-        displayPanel.setBackground(Color.DARK_GRAY);
+        displayPanel.setBackground(Constants.bgColor);
         displayPanel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
         JLabel mostValuableArtwork = new JLabel();
         JLabel leastValuableArtwork = new JLabel();
-        mostValuableArtwork.setPreferredSize(new Dimension(AsyncCalls.albumArtWidth, AsyncCalls.albumArtHeight));
-        leastValuableArtwork.setPreferredSize(new Dimension(AsyncCalls.albumArtWidth, AsyncCalls.albumArtHeight));
+        mostValuableArtwork.setPreferredSize(new Dimension(Constants.albumArtWidth, Constants.albumArtHeight));
+        leastValuableArtwork.setPreferredSize(new Dimension(Constants.albumArtWidth, Constants.albumArtHeight));
         String mostValUrl = collectionStats.getMostValuableRecord() != null ?
                 collectionStats.getMostValuableRecord().getThumbUrl() : "";
         String leastValUrl = collectionStats.getLeastValuableRecord() != null ?
@@ -52,7 +53,7 @@ public class StatsUI extends JPanel {
 
     private JPanel buildAlbumContainer(Record record, String title, JLabel artwork) {
         JPanel container = new JPanel();
-        container.setBackground(Color.DARK_GRAY);
+        container.setBackground(Constants.bgColor);
         container.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
         container.setLayout(new BorderLayout());
         if (record != null) {

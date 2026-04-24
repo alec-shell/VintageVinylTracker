@@ -3,24 +3,13 @@ package org.example.Logic;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.Client.ProxyClient;
+import org.example.Config.Constants;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
 
 public class ParseAPIResponse {
-
-    public static String[] conditions = new String[] {
-            "Mint (M)",
-            "Near Mint (NM or M-)",
-            "Very Good Plus (VG+)",
-            "Very Good (VG)",
-            "Good Plus (G+)",
-            "Good (G)",
-            "Fair (F)",
-            "Poor (P)"
-    };
-    private static final int RESULTS_CAP = 250;
     public static double[] selectionPrices = new double[8];
 
     public static ArrayList<Record> buildSearchQueryCollection(ProxyClient proxyClient, String album, String artist, String year, String catNo) {
@@ -29,7 +18,7 @@ public class ParseAPIResponse {
         int pageNo = 1;
         boolean hasNextPage = true;
 
-        while (hasNextPage && records.size() < RESULTS_CAP) {
+        while (hasNextPage && records.size() < Constants.RESULTS_CAP) {
             try {
                 String body = proxyClient.getSearchQuery(album, artist, year, catNo, pageNo++);
                 JsonNode jsonNode = mapper.readTree(body);
@@ -92,10 +81,10 @@ public class ParseAPIResponse {
     } // buildPricingQueryCollection()
 
     private static void addConditionalPrices(JsonNode jsonNode, ArrayList<String> pricingByCondition) {
-        for (int i = 0; i < conditions.length; i++) {
-            Double price = Double.parseDouble(jsonNode.path(conditions[i]).path("value").asText());
+        for (int i = 0; i < Constants.pricingConditions.length; i++) {
+            Double price = Double.parseDouble(jsonNode.path(Constants.pricingConditions[i]).path("value").asText());
             selectionPrices[i] = price;
-            pricingByCondition.add(conditions[i] + ": $" + String.format("%.2f", price));
+            pricingByCondition.add(Constants.pricingConditions[i] + ": $" + String.format("%.2f", price));
         }
     } // addConditionalPrices()
 
