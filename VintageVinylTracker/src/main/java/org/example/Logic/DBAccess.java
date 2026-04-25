@@ -6,6 +6,9 @@
 
 package org.example.Logic;
 
+import org.example.Config.Constants;
+import org.example.DTO.Record;
+
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,9 +17,8 @@ public class DBAccess {
     private final Connection conn;
 
     public DBAccess() {
-        String url =  "jdbc:sqlite:VintageVinyl.db";
         try {
-            conn = DriverManager.getConnection(url);
+            conn = DriverManager.getConnection(Constants.DB_URI);
             initTables();
         } catch (SQLException e) {
             System.out.println("Connection failed... " + e.getMessage());
@@ -75,12 +77,12 @@ public class DBAccess {
         }
     } // addEntry()
 
-    public final ArrayList<Record> searchRecordEntries(String bandName, String albumName, String year, String catNo, String isOwned) {
-        ArrayList<Record> resultsList = new ArrayList<>();
+    public final ArrayList<org.example.DTO.Record> searchRecordEntries(String bandName, String albumName, String year, String catNo, String isOwned) {
+        ArrayList<org.example.DTO.Record> resultsList = new ArrayList<>();
         try(PreparedStatement stmt = buildRecordSearchStmt(bandName, albumName, year, catNo, isOwned)) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                Record temp = new Record(rs.getInt("id"),
+                org.example.DTO.Record temp = new Record(rs.getInt("id"),
                         rs.getString("band_name"),
                         rs.getString("album_name"),
                         rs.getString("year"),

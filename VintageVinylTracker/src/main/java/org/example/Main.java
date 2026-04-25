@@ -13,7 +13,7 @@ import com.github.javakeyring.Keyring;
 import org.example.Client.AuthorizationClient;
 import org.example.Client.ProxyClient;
 import org.example.GUI.MainUI;
-import org.example.Logic.AsyncCalls;
+import org.example.GUI.async.AsyncCalls;
 import org.example.Logic.DBAccess;
 import org.example.Logic.EventTriggers;
 import org.example.Logic.GenerateStats;

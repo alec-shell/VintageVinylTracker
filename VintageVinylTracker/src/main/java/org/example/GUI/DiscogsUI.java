@@ -2,8 +2,8 @@ package org.example.GUI;
 
 import org.example.Client.ProxyClient;
 import org.example.Config.Constants;
-import org.example.Logic.Record;
-import org.example.Logic.AsyncCalls;
+import org.example.DTO.Record;
+import org.example.GUI.async.AsyncCalls;
 import org.example.Logic.DBAccess;
 import org.example.Logic.EventTriggers;
 import org.example.Logic.GenerateStats;
@@ -31,6 +31,7 @@ public class DiscogsUI extends JPanel {
     private final EventTriggers eventTriggers;
     private final AsyncCalls asyncCalls;
     private ArrayList<Record> records;
+    private ArrayList<Double> selectionPrices = new ArrayList<>();
 
     public DiscogsUI(ProxyClient proxyClient, DBAccess dbAccess, 
             GenerateStats collectionStats, EventTriggers eventTriggers,
@@ -57,7 +58,7 @@ public class DiscogsUI extends JPanel {
             int rowIndex = discogsTable.convertRowIndexToModel(discogsTable.getSelectedRow());
 
             asyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel);
-            asyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel);
+            asyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel, selectionPrices);
         });
     } // addTableListener()
 
@@ -121,7 +122,7 @@ public class DiscogsUI extends JPanel {
         selected.setCondition(condition);
         for (int i = 0; i < Constants.pricingConditions.length; i++) {
             if (condition.equals(Constants.pricingConditions[i])) {
-                selected.setValue(ParseAPIResponse.selectionPrices[i]);
+                selected.setValue(selectionPrices.get(i));
             }
         }
         sendAlbumToDB(selected);

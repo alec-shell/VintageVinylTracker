@@ -1,9 +1,9 @@
 package org.example.GUI;
 
 import org.example.Config.Constants;
-import org.example.Logic.AsyncCalls;
+import org.example.GUI.async.AsyncCalls;
 import org.example.Logic.GenerateStats;
-import org.example.Logic.Record;
+import org.example.DTO.Record;
 
 import javax.swing.*;
 import java.awt.*;

@@ -51,4 +51,7 @@ public class Constants {
     // limits
     public static final int RESULTS_CAP = 250;
 
+    // db access
+    public static final String DB_URI =  "jdbc:sqlite:VintageVinyl.db";
+
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import org.example.Client.ProxyClient;
+import org.example.DTO.Record;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,12 +13,12 @@ public class GenerateStats {
     private int albumCount = 0;
     private double totalInvested = 0;
     private double totalValue = 0;
-    private Record mostValuableRecord = null;
-    private Record leastValuableRecord = null;
+    private org.example.DTO.Record mostValuableRecord = null;
+    private org.example.DTO.Record leastValuableRecord = null;
     private final ProxyClient proxyClient;
     private final DBAccess dbAccess;
     private final JsonMapper mapper;
-    private ArrayList<Record> ownedRecords;
+    private ArrayList<org.example.DTO.Record> ownedRecords;
     private boolean isUpdating = false;
 
     public GenerateStats(ProxyClient proxyClient, DBAccess dbAccess, JsonMapper mapper) {
@@ -38,7 +39,7 @@ public class GenerateStats {
             mostValuableRecord = ownedRecords.getFirst();
             leastValuableRecord = ownedRecords.getFirst();
         }
-        for (Record record : ownedRecords) {
+        for (org.example.DTO.Record record : ownedRecords) {
             totalValue += record.getValue();
             totalInvested += record.getPurchasePrice();
             if (mostValuableRecord.getValue() < record.getValue()) mostValuableRecord = record;
@@ -46,7 +47,7 @@ public class GenerateStats {
         }
     } // retrieveOwnedAlbums()
 
-    private void updateRecordValue(Record record) {
+    private void updateRecordValue(org.example.DTO.Record record) {
         try {
             String priceResponse = proxyClient.getPriceSuggestions(record.getID());
             JsonNode nodes = mapper.readTree(priceResponse);
@@ -58,8 +59,8 @@ public class GenerateStats {
     } // updateRecordValue()
 
     public void updateOwnedValues() {
-        List<Record> ownedCopies =  new ArrayList<>(ownedRecords);
-        for (Record copy: ownedCopies) {
+        List<org.example.DTO.Record> ownedCopies =  new ArrayList<>(ownedRecords);
+        for (org.example.DTO.Record copy: ownedCopies) {
             updateRecordValue(copy);
         }
         parseOwnedAlbums();
@@ -87,7 +88,7 @@ public class GenerateStats {
         return totalValue;
     } // getTotalValue()
 
-    public Record getMostValuableRecord() {
+    public org.example.DTO.Record getMostValuableRecord() {
         return mostValuableRecord;
     } // getMostValuableRecord()
 

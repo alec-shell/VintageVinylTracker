@@ -60,4 +60,6 @@ public class ProxyClient {
         }
     } // getPricingSuggestions()
 
+
+
 } // DiscogsClient class

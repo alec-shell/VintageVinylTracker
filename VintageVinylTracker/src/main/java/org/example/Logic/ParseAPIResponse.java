@@ -4,17 +4,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.example.Client.ProxyClient;
 import org.example.Config.Constants;
+import org.example.DTO.Record;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class ParseAPIResponse {
     public static double[] selectionPrices = new double[8];
 
-    public static ArrayList<Record> buildSearchQueryCollection(ProxyClient proxyClient, String album, String artist, String year, String catNo) {
+    public static ArrayList<org.example.DTO.Record> buildSearchQueryCollection(ProxyClient proxyClient, String album, String artist, String year, String catNo) {
         ObjectMapper mapper = new ObjectMapper();
-        ArrayList<Record> records = new ArrayList<>();
+        ArrayList<org.example.DTO.Record> records = new ArrayList<>();
         int pageNo = 1;
         boolean hasNextPage = true;
 
@@ -37,7 +39,7 @@ public class ParseAPIResponse {
         return records;
     } // buildSearchQueryCollection()
 
-    private static Record convertNodeToRecord(JsonNode node) {
+    private static org.example.DTO.Record convertNodeToRecord(JsonNode node) {
         int id = Integer.parseInt(node.path("id").asText());
         String[] title = node.path("title").asText().split(" - ");
         String artist = title[0];
@@ -60,31 +62,23 @@ public class ParseAPIResponse {
                 "NONE");
     } // convertNodeToRecord()
 
-    public static String buildPricingQueryCollection(ProxyClient proxyClient, int id) {
+    public static HashMap<Double, String> buildPricingQueryCollection(ProxyClient proxyClient, int id) {
         ObjectMapper mapper = new ObjectMapper();
-        ArrayList<String> pricingByCondition = new ArrayList<>();
+        HashMap<Double, String> priceMap = new HashMap<>();
         try {
             String json = proxyClient.getPriceSuggestions(id);
             JsonNode jsonNode = mapper.readTree(json);
-            addConditionalPrices(jsonNode, pricingByCondition);
+            addConditionalPrices(jsonNode, priceMap);
         } catch (IOException e) {
             System.out.println("Could not complete pricing query: " + e.getMessage());
         }
-        StringBuilder returnString = new StringBuilder();
-        returnString.append("<html>");
-        for (String price: pricingByCondition) {
-            returnString.append(price);
-            returnString.append("<br>");
-        }
-        returnString.append("</html>");
-        return returnString.toString();
+        return priceMap;
     } // buildPricingQueryCollection()
 
-    private static void addConditionalPrices(JsonNode jsonNode, ArrayList<String> pricingByCondition) {
+    private static void addConditionalPrices(JsonNode jsonNode, HashMap<Double, String> priceMap) {
         for (int i = 0; i < Constants.pricingConditions.length; i++) {
             Double price = Double.parseDouble(jsonNode.path(Constants.pricingConditions[i]).path("value").asText());
-            selectionPrices[i] = price;
-            pricingByCondition.add(Constants.pricingConditions[i] + ": $" + String.format("%.2f", price));
+            priceMap.put(price, Constants.pricingConditions[i] + ": $" + String.format("%.2f", price));
         }
     } // addConditionalPrices()
 

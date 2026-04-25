@@ -2,8 +2,8 @@ package org.example.GUI;
 
 import org.example.Client.ProxyClient;
 import org.example.Config.Constants;
-import org.example.Logic.Record;
-import org.example.Logic.AsyncCalls;
+import org.example.DTO.Record;
+import org.example.GUI.async.AsyncCalls;
 import org.example.Logic.DBAccess;
 import org.example.Logic.EventTriggers;
 import org.example.Logic.GenerateStats;
@@ -13,8 +13,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 
@@ -33,6 +31,7 @@ public class DBSearchUI extends JPanel {
     private final JLabel pricingInfoLabel = new JLabel();
     private final ProxyClient proxyClient;
     private final AsyncCalls asyncCalls;
+    private ArrayList<Double> selectionPrices = new ArrayList<>();
 
     public DBSearchUI(ProxyClient proxyClient, DBAccess dbAccess,
                       GenerateStats collectionStats, EventTriggers eventTriggers,
@@ -60,7 +59,7 @@ public class DBSearchUI extends JPanel {
             int rowIndex = dbTable.convertRowIndexToModel(dbTable.getSelectedRow());
             if (records == null || records.size() <= rowIndex) { return; }
             asyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel);
-            asyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel);
+            asyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel, selectionPrices);
         });
     } // addTableListener()
 
