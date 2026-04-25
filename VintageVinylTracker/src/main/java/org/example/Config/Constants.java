@@ -45,13 +45,9 @@ public class Constants {
     public static final int albumArtHeight = 180;
 
     // default icon
-    public static final String defaultIconImgPath = "/img/defaultThumbnail.jpg";
     public static ImageIcon defaultThumbNail;
 
     // limits
     public static final int RESULTS_CAP = 250;
-
-    // db access
-    public static final String DB_URI =  "jdbc:sqlite:VintageVinyl.db";
 
 }

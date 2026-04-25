@@ -2,7 +2,7 @@ package org.example.GUI;
 
 import org.example.Config.Constants;
 import org.example.GUI.async.AsyncCalls;
-import org.example.Logic.GenerateStats;
+import org.example.Service.GenerateStats;
 import org.example.DTO.Record;
 
 import javax.swing.*;

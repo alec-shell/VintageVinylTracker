@@ -2,7 +2,7 @@ package org.example.GUI.async;
 
 import org.example.Client.ProxyClient;
 import org.example.Config.Constants;
-import org.example.Logic.ParseAPIResponse;
+import org.example.Service.ParseAPIResponse;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -15,11 +15,11 @@ import java.util.concurrent.ExecutionException;
 
 public class AsyncCalls {
 
-    public void asyncPricingCall(ProxyClient proxyClient, int id, JLabel label, ArrayList<Double> prices) {
-        SwingWorker<HashMap<Double, String>, Void> worker = new SwingWorker<>() {
+    public void asyncPricingCall(ProxyClient proxyClient, int id, JLabel label, HashMap<String, Double> prices) {
+        SwingWorker<HashMap<String, Double>, Void> worker = new SwingWorker<>() {
 
             @Override
-            protected HashMap<Double, String> doInBackground() {
+            protected HashMap<String, Double> doInBackground() {
                 return ParseAPIResponse.buildPricingQueryCollection(proxyClient, id);
             } // doInBackground()
 
@@ -27,9 +27,10 @@ public class AsyncCalls {
             protected void done() {
                 try {
                     // JLabel allows for html formatting
-                    HashMap<Double, String> result = get();
-                    String html = convertToHtml(result.values());
-                    prices.addAll(result.keySet());
+                    prices.clear();
+                    prices.putAll(get());
+                    String html = convertToHtml(prices);
+
                     label.setText(html);
                 } catch (InterruptedException | ExecutionException e) {
                     label.setText("Unavailable");
@@ -60,11 +61,13 @@ public class AsyncCalls {
         worker.execute();
     } // asyncThumbnailCall()
 
-    private String convertToHtml(Collection<String> pricingByCondition) {
+    private String convertToHtml(HashMap<String, Double> prices) {
         StringBuilder returnString = new StringBuilder();
         returnString.append("<html>");
-        for (String price: pricingByCondition) {
-            returnString.append(price);
+        for (String condition : Constants.pricingConditions) {
+            returnString.append(condition);
+            returnString.append(": ");
+            returnString.append(String.format("%.2f", prices.get(condition)));
             returnString.append("<br>");
         }
         returnString.append("</html>");

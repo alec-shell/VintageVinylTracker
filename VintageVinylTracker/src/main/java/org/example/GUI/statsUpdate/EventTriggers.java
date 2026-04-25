@@ -1,12 +1,10 @@
-package org.example.Logic;
+package org.example.GUI.statsUpdate;
 
 import org.example.GUI.StatsUI;
 
 
 public class EventTriggers {
     private StatsUI statsUI;
-
-    public EventTriggers() {} // no arg constructor
 
     public void setStatsUI(StatsUI statsUI) {
         this.statsUI = statsUI;

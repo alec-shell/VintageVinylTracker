@@ -4,9 +4,9 @@ import org.example.Client.ProxyClient;
 import org.example.Config.Constants;
 import org.example.DTO.Record;
 import org.example.GUI.async.AsyncCalls;
-import org.example.Logic.DBAccess;
-import org.example.Logic.EventTriggers;
-import org.example.Logic.GenerateStats;
+import org.example.Service.DBAccess;
+import org.example.GUI.statsUpdate.EventTriggers;
+import org.example.Service.GenerateStats;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -14,6 +14,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class DBSearchUI extends JPanel {
@@ -31,7 +32,7 @@ public class DBSearchUI extends JPanel {
     private final JLabel pricingInfoLabel = new JLabel();
     private final ProxyClient proxyClient;
     private final AsyncCalls asyncCalls;
-    private ArrayList<Double> selectionPrices = new ArrayList<>();
+    private final HashMap<String, Double> selectionPrices = new HashMap<>();
 
     public DBSearchUI(ProxyClient proxyClient, DBAccess dbAccess,
                       GenerateStats collectionStats, EventTriggers eventTriggers,
@@ -55,8 +56,10 @@ public class DBSearchUI extends JPanel {
 
     private void addTableListener() {
         dbTable.getSelectionModel().addListSelectionListener(e -> {
-            if (e.getValueIsAdjusting()) return;
-            int rowIndex = dbTable.convertRowIndexToModel(dbTable.getSelectedRow());
+            if (e.getValueIsAdjusting()) { return; }
+            int viewRow = dbTable.getSelectedRow();
+            if  (viewRow < 0) { return; }
+            int rowIndex = dbTable.convertRowIndexToModel(viewRow);
             if (records == null || records.size() <= rowIndex) { return; }
             asyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel);
             asyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel, selectionPrices);
@@ -82,10 +85,11 @@ public class DBSearchUI extends JPanel {
 
     private void removeAlbumListener() {
         int selectedIndex = dbTable.getSelectedRow();
-        if (records == null || records.size() <= selectedIndex) { return; }
-        boolean deleted = dbAccess.deleteRecordEntry(records.get(selectedIndex).getID());
+        if (records == null || records.size() <= selectedIndex || selectedIndex < 0) { return; }
+        int modelRow = dbTable.convertRowIndexToModel(selectedIndex);
+        boolean deleted = dbAccess.deleteRecordEntry(records.get(modelRow).getID());
         if (deleted) {
-            records.remove(selectedIndex);
+            records.remove(modelRow);
             updateResultsDisplay(records);
             albumArtLabel.setIcon(Constants.defaultThumbNail);
             pricingInfoLabel.setText("");
@@ -173,18 +177,18 @@ public class DBSearchUI extends JPanel {
     } // ownedRadioSelector
 
     private void submitActionListener() {
-        searchDB();
+        records = searchDB();
+        updateResultsDisplay(records);
         albumArtLabel.setIcon(Constants.defaultThumbNail);
         pricingInfoLabel.setText("");
     }// submitActionListener()
 
-    private void searchDB() {
+    private ArrayList<Record> searchDB() {
         String artist = !artistNameJTF.getText().isBlank() ? artistNameJTF.getText() : null;
         String album = !albumNameJTF.getText().isBlank() ? albumNameJTF.getText() : null;
         String year = !yearJTF.getText().isBlank() ? yearJTF.getText() : null;
         String catNo = !catNoJTF.getText().isBlank() ? catNoJTF.getText() : null;
-        records = dbAccess.searchRecordEntries(artist, album, year, catNo, ownedBtnGroup.getSelection().getActionCommand());
-        updateResultsDisplay(records);
+        return dbAccess.searchRecordEntries(artist, album, year, catNo, ownedBtnGroup.getSelection().getActionCommand());
     } // searchDB()
 
     private JPanel getEntryField(String fieldName, JTextField entryField) {
@@ -208,8 +212,7 @@ public class DBSearchUI extends JPanel {
                     record.getYear(),
                     record.getCountry(),
                     Boolean.toString(record.isOwned()),
-                    record.getCondition()
-            });
+                    record.getCondition()});
         }
     } // updateResultsDisplay()
 

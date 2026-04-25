@@ -14,9 +14,9 @@ import org.example.Client.AuthorizationClient;
 import org.example.Client.ProxyClient;
 import org.example.GUI.MainUI;
 import org.example.GUI.async.AsyncCalls;
-import org.example.Logic.DBAccess;
-import org.example.Logic.EventTriggers;
-import org.example.Logic.GenerateStats;
+import org.example.Service.DBAccess;
+import org.example.GUI.statsUpdate.EventTriggers;
+import org.example.Service.GenerateStats;
 
 import javax.swing.*;
 import java.awt.*;

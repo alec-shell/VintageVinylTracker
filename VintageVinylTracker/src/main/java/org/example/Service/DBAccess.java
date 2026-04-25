@@ -4,9 +4,10 @@
  * 11/26/2025
  */
 
-package org.example.Logic;
+package org.example.Service;
 
 import org.example.Config.Constants;
+import org.example.Config.URIConfig;
 import org.example.DTO.Record;
 
 import java.sql.*;
@@ -18,7 +19,7 @@ public class DBAccess {
 
     public DBAccess() {
         try {
-            conn = DriverManager.getConnection(Constants.DB_URI);
+            conn = DriverManager.getConnection(URIConfig.DB_URI);
             initTables();
         } catch (SQLException e) {
             System.out.println("Connection failed... " + e.getMessage());

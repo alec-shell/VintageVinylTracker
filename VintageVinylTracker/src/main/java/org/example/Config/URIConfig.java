@@ -11,5 +11,9 @@ public class URIConfig {
     public static URI SEARCH_URI = URI.create("https://sowhatnow.us:8443/discogs/search");
     public static URI PRICING_URI = URI.create("https://sowhatnow.us:8443/discogs/pricing");
 
+    // db access
+    public static final String DB_URI =  "jdbc:sqlite:VintageVinyl.db";
 
+    // default image src
+    public static final String defaultIconImgPath = "/img/defaultThumbnail.jpg";
 } // URIConfig class

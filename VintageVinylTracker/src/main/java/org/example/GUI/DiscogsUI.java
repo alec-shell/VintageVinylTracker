@@ -4,10 +4,10 @@ import org.example.Client.ProxyClient;
 import org.example.Config.Constants;
 import org.example.DTO.Record;
 import org.example.GUI.async.AsyncCalls;
-import org.example.Logic.DBAccess;
-import org.example.Logic.EventTriggers;
-import org.example.Logic.GenerateStats;
-import org.example.Logic.ParseAPIResponse;
+import org.example.Service.DBAccess;
+import org.example.GUI.statsUpdate.EventTriggers;
+import org.example.Service.GenerateStats;
+import org.example.Service.ParseAPIResponse;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -15,6 +15,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class DiscogsUI extends JPanel {
@@ -31,7 +32,7 @@ public class DiscogsUI extends JPanel {
     private final EventTriggers eventTriggers;
     private final AsyncCalls asyncCalls;
     private ArrayList<Record> records;
-    private ArrayList<Double> selectionPrices = new ArrayList<>();
+    private final HashMap<String, Double> selectionPrices = new HashMap<>();
 
     public DiscogsUI(ProxyClient proxyClient, DBAccess dbAccess, 
             GenerateStats collectionStats, EventTriggers eventTriggers,
@@ -54,9 +55,11 @@ public class DiscogsUI extends JPanel {
 
     private void addTableListener() {
         discogsTable.getSelectionModel().addListSelectionListener(e -> {
-            if (e.getValueIsAdjusting()) return;
-            int rowIndex = discogsTable.convertRowIndexToModel(discogsTable.getSelectedRow());
-
+            if (e.getValueIsAdjusting()) { return; }
+            int viewRow = discogsTable.getSelectedRow();
+            if  (viewRow < 0) { return; }
+            int rowIndex = discogsTable.convertRowIndexToModel(viewRow);
+            if (records == null || records.size() <= rowIndex) { return; }
             asyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel);
             asyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel, selectionPrices);
         });
@@ -81,8 +84,9 @@ public class DiscogsUI extends JPanel {
 
     private void addAlbumActionListener() {
         int tableIndex = discogsTable.getSelectedRow();
-        if (records == null || records.size() <= tableIndex) { return; }
-        Record selectedRecord = records.get(tableIndex);
+        if (records == null || records.size() <= tableIndex || tableIndex < 0) { return; }
+        int modelRow =  discogsTable.convertRowIndexToModel(tableIndex);
+        Record selectedRecord = records.get(modelRow);
         int owned = JOptionPane.showConfirmDialog(this,
                 "Do you own this album?",
                 "Add Album",
@@ -120,11 +124,7 @@ public class DiscogsUI extends JPanel {
                         Constants.pricingConditions[0]
         );
         selected.setCondition(condition);
-        for (int i = 0; i < Constants.pricingConditions.length; i++) {
-            if (condition.equals(Constants.pricingConditions[i])) {
-                selected.setValue(selectionPrices.get(i));
-            }
-        }
+        selected.setValue(selectionPrices.get(condition));
         sendAlbumToDB(selected);
     } // addOwnedAlbum()
 

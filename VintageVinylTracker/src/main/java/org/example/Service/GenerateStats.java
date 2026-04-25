@@ -1,4 +1,4 @@
-package org.example.Logic;
+package org.example.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

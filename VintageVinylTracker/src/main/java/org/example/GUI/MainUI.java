@@ -3,10 +3,11 @@ package org.example.GUI;
 import org.example.Client.AuthorizationClient;
 import org.example.Client.ProxyClient;
 import org.example.Config.Constants;
+import org.example.Config.URIConfig;
 import org.example.GUI.async.AsyncCalls;
-import org.example.Logic.DBAccess;
-import org.example.Logic.EventTriggers;
-import org.example.Logic.GenerateStats;
+import org.example.Service.DBAccess;
+import org.example.GUI.statsUpdate.EventTriggers;
+import org.example.Service.GenerateStats;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,7 +33,7 @@ public class MainUI extends JFrame {
         this.setSize(1000, 600);
         this.setLayout(new BorderLayout());
         this.authorizationClient = authorizationClient;
-        final URL defaultURL = getClass().getResource(Constants.defaultIconImgPath);
+        final URL defaultURL = getClass().getResource(URIConfig.defaultIconImgPath);
         setDefaultThumbNail(defaultURL);
         this.statsUI = new StatsUI(collectionStats, asyncCalls);
         eventTriggers.setStatsUI(statsUI);

@@ -1,4 +1,4 @@
-package org.example.Logic;
+package org.example.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,7 +12,6 @@ import java.util.HashMap;
 
 
 public class ParseAPIResponse {
-    public static double[] selectionPrices = new double[8];
 
     public static ArrayList<org.example.DTO.Record> buildSearchQueryCollection(ProxyClient proxyClient, String album, String artist, String year, String catNo) {
         ObjectMapper mapper = new ObjectMapper();
@@ -62,9 +61,9 @@ public class ParseAPIResponse {
                 "NONE");
     } // convertNodeToRecord()
 
-    public static HashMap<Double, String> buildPricingQueryCollection(ProxyClient proxyClient, int id) {
+    public static HashMap<String, Double> buildPricingQueryCollection(ProxyClient proxyClient, int id) {
         ObjectMapper mapper = new ObjectMapper();
-        HashMap<Double, String> priceMap = new HashMap<>();
+        HashMap<String, Double> priceMap = new HashMap<>();
         try {
             String json = proxyClient.getPriceSuggestions(id);
             JsonNode jsonNode = mapper.readTree(json);
@@ -75,10 +74,10 @@ public class ParseAPIResponse {
         return priceMap;
     } // buildPricingQueryCollection()
 
-    private static void addConditionalPrices(JsonNode jsonNode, HashMap<Double, String> priceMap) {
+    private static void addConditionalPrices(JsonNode jsonNode, HashMap<String, Double> priceMap) {
         for (int i = 0; i < Constants.pricingConditions.length; i++) {
             Double price = Double.parseDouble(jsonNode.path(Constants.pricingConditions[i]).path("value").asText());
-            priceMap.put(price, Constants.pricingConditions[i] + ": $" + String.format("%.2f", price));
+            priceMap.put(Constants.pricingConditions[i], price);
         }
     } // addConditionalPrices()
 
