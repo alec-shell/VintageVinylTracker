@@ -14,7 +14,7 @@ import org.example.Client.AuthorizationClient;
 import org.example.Client.ProxyClient;
 import org.example.GUI.MainUI;
 import org.example.GUI.async.AsyncCalls;
-import org.example.Service.DBAccess;
+import org.example.Service.DBAccessService;
 import org.example.GUI.statsUpdate.EventTriggers;
 import org.example.Service.GenerateStats;
 
@@ -49,8 +49,10 @@ public class Main {
         JsonMapper mapper = new JsonMapper();
         this.authorizationClient = new AuthorizationClient(httpClient, keyRing, mapper);
         ProxyClient proxyClient = new ProxyClient(httpClient, keyRing, mapper);
-        DBAccess dbAccess = new DBAccess();
+        DBAccessService dbAccess = new DBAccessService();
+        dbAccess.initConnection();
         GenerateStats collectionStats = new GenerateStats(proxyClient, dbAccess, mapper);
+        collectionStats.initStats();
         AsyncCalls asyncCalls = new AsyncCalls();
         EventTriggers eventTriggers = new EventTriggers();
         MainUI mainUI = new MainUI(collectionStats, proxyClient, dbAccess,

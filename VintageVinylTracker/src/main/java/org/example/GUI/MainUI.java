@@ -5,7 +5,7 @@ import org.example.Client.ProxyClient;
 import org.example.Config.Constants;
 import org.example.Config.URIConfig;
 import org.example.GUI.async.AsyncCalls;
-import org.example.Service.DBAccess;
+import org.example.Service.DBAccessService;
 import org.example.GUI.statsUpdate.EventTriggers;
 import org.example.Service.GenerateStats;
 
@@ -26,7 +26,7 @@ public class MainUI extends JFrame {
     private final AuthorizationClient authorizationClient;
 
     public MainUI(GenerateStats collectionStats, ProxyClient proxyClient,
-                  DBAccess dbAccess, AuthorizationClient authorizationClient,
+                  DBAccessService dbAccess, AuthorizationClient authorizationClient,
                   AsyncCalls asyncCalls, EventTriggers eventTriggers) {
         this.setTitle("Vintage Vinyl");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

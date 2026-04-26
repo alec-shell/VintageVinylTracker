@@ -16,18 +16,21 @@ public class GenerateStats {
     private org.example.DTO.Record mostValuableRecord = null;
     private org.example.DTO.Record leastValuableRecord = null;
     private final ProxyClient proxyClient;
-    private final DBAccess dbAccess;
+    private final DBAccessService dbAccess;
     private final JsonMapper mapper;
     private ArrayList<org.example.DTO.Record> ownedRecords;
     private boolean isUpdating = false;
 
-    public GenerateStats(ProxyClient proxyClient, DBAccess dbAccess, JsonMapper mapper) {
+    public GenerateStats(ProxyClient proxyClient, DBAccessService dbAccess, JsonMapper mapper) {
         this.proxyClient = proxyClient;
         this.dbAccess = dbAccess;
         this.mapper = mapper;
+    } // constructor
+
+    public void initStats() {
         parseOwnedAlbums();
         isUpdating = dbAccess.checkForUpdate();
-    } // constructor
+    } // initStats()
 
     public void parseOwnedAlbums() {
         resetValues();
@@ -39,15 +42,15 @@ public class GenerateStats {
             mostValuableRecord = ownedRecords.getFirst();
             leastValuableRecord = ownedRecords.getFirst();
         }
-        for (org.example.DTO.Record record : ownedRecords) {
+        for (Record record : ownedRecords) {
             totalValue += record.getValue();
             totalInvested += record.getPurchasePrice();
             if (mostValuableRecord.getValue() < record.getValue()) mostValuableRecord = record;
-            else if (leastValuableRecord.getValue() > record.getValue()) leastValuableRecord = record;
+            if (leastValuableRecord.getValue() > record.getValue()) leastValuableRecord = record;
         }
     } // retrieveOwnedAlbums()
 
-    private void updateRecordValue(org.example.DTO.Record record) {
+    private void updateRecordValue(Record record) {
         try {
             String priceResponse = proxyClient.getPriceSuggestions(record.getID());
             JsonNode nodes = mapper.readTree(priceResponse);
@@ -88,7 +91,7 @@ public class GenerateStats {
         return totalValue;
     } // getTotalValue()
 
-    public org.example.DTO.Record getMostValuableRecord() {
+    public Record getMostValuableRecord() {
         return mostValuableRecord;
     } // getMostValuableRecord()
 

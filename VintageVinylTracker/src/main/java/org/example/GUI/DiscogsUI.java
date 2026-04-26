@@ -2,12 +2,12 @@ package org.example.GUI;
 
 import org.example.Client.ProxyClient;
 import org.example.Config.Constants;
+import org.example.Controller.APIController;
 import org.example.DTO.Record;
 import org.example.GUI.async.AsyncCalls;
-import org.example.Service.DBAccess;
+import org.example.Service.DBAccessService;
 import org.example.GUI.statsUpdate.EventTriggers;
 import org.example.Service.GenerateStats;
-import org.example.Service.ParseAPIResponse;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -27,14 +27,14 @@ public class DiscogsUI extends JPanel {
     private JLabel albumArtLabel;
     private final JLabel pricingInfoLabel = new JLabel();
     private final ProxyClient proxyClient;
-    private final DBAccess dbAccess;
+    private final DBAccessService dbAccess;
     private final GenerateStats collectionStats;
     private final EventTriggers eventTriggers;
     private final AsyncCalls asyncCalls;
     private ArrayList<Record> records;
     private final HashMap<String, Double> selectionPrices = new HashMap<>();
 
-    public DiscogsUI(ProxyClient proxyClient, DBAccess dbAccess, 
+    public DiscogsUI(ProxyClient proxyClient, DBAccessService dbAccess,
             GenerateStats collectionStats, EventTriggers eventTriggers,
             AsyncCalls asyncCalls) {
         this.proxyClient = proxyClient;
@@ -259,7 +259,7 @@ public class DiscogsUI extends JPanel {
         SwingWorker<Object, Object> worker = new SwingWorker<>() {
             @Override
             protected Object doInBackground() {
-                records = ParseAPIResponse.buildSearchQueryCollection(proxyClient, album, artist, year, catNo);
+                records = APIController.getDiscogsSearchResults(proxyClient, album, artist, year, catNo);
                 return null;
             } // doInBackground()
 
