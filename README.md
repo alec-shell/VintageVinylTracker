@@ -14,7 +14,9 @@ VintageVinyl's accompanying server application, VVServer, is currently running o
 
 * Link to server repo: https://github.com/alec-shell/VVServer/tree/main
 
-<img width="1440" height="900" alt="Screenshot 2026-02-23 at 6 10 17 PM" src="https://github.com/user-attachments/assets/13d878f2-9f36-4179-8308-1443a46d6176" />
-<img width="1440" height="900" alt="Screenshot 2026-02-23 at 6 11 33 PM" src="https://github.com/user-attachments/assets/ce7a5996-a800-404b-b6d5-0e322667ea50" />
-<img width="1440" height="900" alt="Screenshot 2026-02-23 at 6 12 09 PM" src="https://github.com/user-attachments/assets/aad54ac4-82c7-4ec6-b728-1f717374909a" />
-<img width="1440" height="900" alt="Screenshot 2026-02-24 at 8 31 43 PM" src="https://github.com/user-attachments/assets/d19fbff7-83d2-49cd-a628-d19aed76539c" />
+<img width="999" height="603" alt="Screenshot 2026-04-26 at 2 50 29 PM" src="https://github.com/user-attachments/assets/45b4a14d-6fb2-4ec0-ab0f-6a3ff766b6af" />
+<img width="1000" height="600" alt="Screenshot 2026-04-26 at 2 51 32 PM" src="https://github.com/user-attachments/assets/25c4e444-0fdb-4ff5-b8ab-35b1a3957177" />
+<img width="1002" height="600" alt="Screenshot 2026-04-26 at 2 51 43 PM" src="https://github.com/user-attachments/assets/a196a422-3a46-4910-bf9d-b6207d6257ea" />
+
+
+
