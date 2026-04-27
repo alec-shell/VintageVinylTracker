@@ -7,7 +7,6 @@ import org.example.Config.URIConfig;
 import org.example.GUI.async.AsyncCalls;
 import org.example.Service.DBAccessService;
 import org.example.GUI.statsUpdate.EventTriggers;
-import org.example.Service.GenerateStats;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,7 +24,7 @@ public class MainUI extends JFrame {
     private boolean sessionAuth = false;
     private final AuthorizationClient authorizationClient;
 
-    public MainUI(GenerateStats collectionStats, ProxyClient proxyClient,
+    public MainUI(ProxyClient proxyClient,
                   DBAccessService dbAccess, AuthorizationClient authorizationClient,
                   AsyncCalls asyncCalls, EventTriggers eventTriggers) {
         this.setTitle("Vintage Vinyl");
@@ -35,10 +34,10 @@ public class MainUI extends JFrame {
         this.authorizationClient = authorizationClient;
         final URL defaultURL = getClass().getResource(URIConfig.defaultIconImgPath);
         setDefaultThumbNail(defaultURL);
-        this.statsUI = new StatsUI(collectionStats, asyncCalls);
+        this.statsUI = new StatsUI(asyncCalls, dbAccess, proxyClient);
         eventTriggers.setStatsUI(statsUI);
-        this.dbSearchUI = new DBSearchUI(proxyClient, dbAccess, collectionStats, eventTriggers, asyncCalls);
-        this.discogsUI = new DiscogsUI(proxyClient, dbAccess, collectionStats, eventTriggers, asyncCalls);
+        this.dbSearchUI = new DBSearchUI(proxyClient, dbAccess, eventTriggers, asyncCalls);
+        this.discogsUI = new DiscogsUI(proxyClient, dbAccess, eventTriggers, asyncCalls);
         buildTabbedPane();
         this.add(tabsPane, BorderLayout.CENTER);
     } // constructor

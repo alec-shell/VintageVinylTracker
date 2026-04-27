@@ -6,21 +6,18 @@ import org.example.DTO.Record;
 import org.example.GUI.async.AsyncCalls;
 import org.example.Service.DBAccessService;
 import org.example.GUI.statsUpdate.EventTriggers;
-import org.example.Service.GenerateStats;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-
 public class DBSearchUI extends JPanel {
     private final JTable dbTable;
+    private final CustomTableModel tableModel =  new CustomTableModel();
     private final DBAccessService dbAccess;
-    private final GenerateStats collectionStats;
     private final EventTriggers eventTriggers;
     private final JTextField albumNameJTF = new JTextField();
     private final JTextField artistNameJTF =  new JTextField();
@@ -34,17 +31,14 @@ public class DBSearchUI extends JPanel {
     private final AsyncCalls asyncCalls;
     private final HashMap<String, Double> selectionPrices = new HashMap<>();
 
-    public DBSearchUI(ProxyClient proxyClient, DBAccessService dbAccess,
-                      GenerateStats collectionStats, EventTriggers eventTriggers,
+    public DBSearchUI(ProxyClient proxyClient, DBAccessService dbAccess, EventTriggers eventTriggers,
                       AsyncCalls asyncCalls) {
         this.dbAccess = dbAccess;
         this.proxyClient = proxyClient;
-        this.collectionStats = collectionStats;
         this.eventTriggers = eventTriggers;
         this.asyncCalls = asyncCalls;
-        TableModel model = new DefaultTableModel(Constants.dbColumnNames, 0);
-        TableRowSorter<TableModel> sorter = new TableRowSorter<>(model);
-        dbTable = new JTable(model);
+        TableRowSorter<CustomTableModel> sorter = new TableRowSorter<>(tableModel);
+        dbTable = new JTable(tableModel);
         dbTable.setRowSorter(sorter);
         addTableListener();
         this.setBackground(Constants.bgColor);
@@ -85,16 +79,15 @@ public class DBSearchUI extends JPanel {
 
     private void removeAlbumListener() {
         int selectedIndex = dbTable.getSelectedRow();
-        if (records == null || records.size() <= selectedIndex || selectedIndex < 0) { return; }
+        if (records == null || records.size() <= selectedIndex || selectedIndex < 0) {return;}
         int modelRow = dbTable.convertRowIndexToModel(selectedIndex);
         boolean deleted = dbAccess.deleteRecordEntry(records.get(modelRow).getID());
         if (deleted) {
+            eventTriggers.updateStatsUI();
             records.remove(modelRow);
-            updateResultsDisplay(records);
+            tableModel.fireTableDataChanged();
             albumArtLabel.setIcon(Constants.defaultThumbNail);
             pricingInfoLabel.setText("");
-            collectionStats.parseOwnedAlbums();
-            eventTriggers.updateStatsUI();
         } else {
             JOptionPane.showMessageDialog(this, "Album could not be deleted",
                     "Error",
@@ -178,7 +171,7 @@ public class DBSearchUI extends JPanel {
 
     private void submitActionListener() {
         records = searchDB();
-        updateResultsDisplay(records);
+        tableModel.fireTableDataChanged();
         albumArtLabel.setIcon(Constants.defaultThumbNail);
         pricingInfoLabel.setText("");
     }// submitActionListener()
@@ -202,18 +195,44 @@ public class DBSearchUI extends JPanel {
         return entryPanel;
     } // getEntryField()
 
-    private void updateResultsDisplay(ArrayList<Record> rows) {
-        DefaultTableModel model = (DefaultTableModel) dbTable.getModel();
-        model.setRowCount(0);
-        for (Record record : rows) {
-            model.addRow(new String[]{record.getCatNo(),
-                    record.getArtistName(),
-                    record.getAlbumName(),
-                    record.getYear(),
-                    record.getCountry(),
-                    Boolean.toString(record.isOwned()),
-                    record.getCondition()});
+
+    private class CustomTableModel extends AbstractTableModel {
+
+        @Override
+        public int getRowCount() {
+            return records == null ? 0 : records.size();
         }
-    } // updateResultsDisplay()
+
+        @Override
+        public int getColumnCount() {
+            return Constants.dbColumnNames.length;
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            return switch (columnIndex) {
+                case 0 -> records.get(rowIndex).getCatNo();
+                case 1 -> records.get(rowIndex).getArtistName();
+                case 2 -> records.get(rowIndex).getAlbumName();
+                case 3 -> records.get(rowIndex).getYear();
+                case 4 -> records.get(rowIndex).getCountry();
+                case 5 -> records.get(rowIndex).isOwned();
+                default -> records.get(rowIndex).getCondition();
+            };
+        }
+
+        @Override
+        public String getColumnName(int column) {
+            return Constants.dbColumnNames[column];
+        }
+
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            if (columnIndex == 3) {return Integer.class;}
+            else if (columnIndex == 5) {return Boolean.class;}
+            return String.class;
+        }
+
+    } // CustomTableModel
 
 } // DBSearchTabUI class

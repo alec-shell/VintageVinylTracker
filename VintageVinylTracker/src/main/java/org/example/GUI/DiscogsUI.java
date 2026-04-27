@@ -7,7 +7,6 @@ import org.example.DTO.Record;
 import org.example.GUI.async.AsyncCalls;
 import org.example.Service.DBAccessService;
 import org.example.GUI.statsUpdate.EventTriggers;
-import org.example.Service.GenerateStats;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -28,18 +27,15 @@ public class DiscogsUI extends JPanel {
     private final JLabel pricingInfoLabel = new JLabel();
     private final ProxyClient proxyClient;
     private final DBAccessService dbAccess;
-    private final GenerateStats collectionStats;
     private final EventTriggers eventTriggers;
     private final AsyncCalls asyncCalls;
     private ArrayList<Record> records;
     private final HashMap<String, Double> selectionPrices = new HashMap<>();
 
-    public DiscogsUI(ProxyClient proxyClient, DBAccessService dbAccess,
-            GenerateStats collectionStats, EventTriggers eventTriggers,
-            AsyncCalls asyncCalls) {
+    public DiscogsUI(ProxyClient proxyClient, DBAccessService dbAccess, EventTriggers eventTriggers,
+                     AsyncCalls asyncCalls) {
         this.proxyClient = proxyClient;
         this.dbAccess = dbAccess;
-        this.collectionStats = collectionStats;
         this.eventTriggers = eventTriggers;
         this.asyncCalls = asyncCalls;
         this.setLayout(new BorderLayout());
@@ -152,7 +148,6 @@ public class DiscogsUI extends JPanel {
                     "Record added to database",
                     "Success",
                     JOptionPane.INFORMATION_MESSAGE);
-            collectionStats.parseOwnedAlbums();
             eventTriggers.updateStatsUI();
         }
     } // sendAlbumToDB()
@@ -256,9 +251,9 @@ public class DiscogsUI extends JPanel {
     } // getEntryField()
 
     private void asyncSearchQueryCall(String album, String artist, String year, String catNo) {
-        SwingWorker<Object, Object> worker = new SwingWorker<>() {
+        SwingWorker<ArrayList<Record>, Object> worker = new SwingWorker<>() {
             @Override
-            protected Object doInBackground() {
+            protected ArrayList<Record> doInBackground() {
                 records = APIController.getDiscogsSearchResults(proxyClient, album, artist, year, catNo);
                 return null;
             } // doInBackground()

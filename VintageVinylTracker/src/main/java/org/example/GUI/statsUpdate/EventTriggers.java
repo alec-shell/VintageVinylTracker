@@ -1,5 +1,6 @@
 package org.example.GUI.statsUpdate;
 
+import org.example.DTO.Record;
 import org.example.GUI.StatsUI;
 
 
@@ -12,8 +13,7 @@ public class EventTriggers {
 
     public void updateStatsUI() {
         if  (statsUI != null) {
-            statsUI.removeAll();
-            statsUI.buildPanel();
+            statsUI.updateStatsUI();
         }
     } // updateStatsUI()
 

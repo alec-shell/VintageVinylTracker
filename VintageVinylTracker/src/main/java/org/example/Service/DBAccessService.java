@@ -156,7 +156,7 @@ public class DBAccessService {
         return ps;
     } // buildRecordSearchStmt()
 
-    public boolean checkForUpdate() {
+    public boolean checkForOwnedPricingUpdate() {
         if (!isValidConnection()) {
             initConnection();
         }
