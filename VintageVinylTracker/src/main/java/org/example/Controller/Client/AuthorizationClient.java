@@ -1,4 +1,4 @@
-package org.example.Client;
+package org.example.Controller.Client;
 
 
 import com.fasterxml.jackson.databind.JsonNode;

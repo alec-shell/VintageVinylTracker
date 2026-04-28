@@ -4,18 +4,21 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import org.example.Client.ProxyClient;
+import org.example.Controller.Client.ProxyClient;
 import org.example.DTO.CollectionStats;
 import org.example.DTO.Record;
 import org.example.Service.DBAccessService;
+import org.example.Service.StatsService;
 
 import java.util.ArrayList;
 
 public class StatsController {
     private static final ObjectMapper mapper = new JsonMapper();
 
-    public static CollectionStats getInitialStats(DBAccessService dbAccessService) {
-        CollectionStats initStats = parseOwnedAlbums(dbAccessService);
+    public static CollectionStats getStats(DBAccessService dbAccessService) {
+        ArrayList<Record> ownedRecords = dbAccessService.searchRecordEntries(null,
+                null, null, null, "true");
+        CollectionStats initStats = StatsService.parseOwnedAlbums(ownedRecords);
         initStats.setIsUpdating(dbAccessService.checkForOwnedPricingUpdate());
         return initStats;
     } // initStats()
@@ -25,7 +28,7 @@ public class StatsController {
         for (Record record: ownedRecords) {
             updateRecordValue(record, proxyClient, dbAccessService);
         }
-        parseOwnedAlbums(dbAccessService);
+        StatsService.parseOwnedAlbums(ownedRecords);
         dbAccessService.updateMetaDate();
     } // updateOwnedValues()
 
@@ -40,28 +43,5 @@ public class StatsController {
             System.out.println("Error updating record price... " + e.getMessage());
         }
     } // updateRecordValue()
-
-    private static CollectionStats parseOwnedAlbums(DBAccessService dbAccess) {
-        ArrayList<Record> ownedRecords = dbAccess.searchRecordEntries(null,
-                null, null, null, "true");
-        int albumCount = ownedRecords.size();
-        Record mostValuableRecord = null;
-        Record leastValuableRecord = null;
-        double totalValue = 0;
-        double totalInvested = 0;
-
-        if  (albumCount > 0) {
-            mostValuableRecord = ownedRecords.getFirst();
-            leastValuableRecord = ownedRecords.getFirst();
-        }
-        for (Record record : ownedRecords) {
-            totalValue += record.getValue();
-            totalInvested += record.getPurchasePrice();
-            if (mostValuableRecord.getValue() < record.getValue()) mostValuableRecord = record;
-            if (leastValuableRecord.getValue() > record.getValue()) leastValuableRecord = record;
-        }
-        return new CollectionStats(albumCount, totalInvested, totalValue,
-                mostValuableRecord, leastValuableRecord, ownedRecords);
-    } // retrieveOwnedAlbums()
 
 }

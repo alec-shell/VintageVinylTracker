@@ -1,6 +1,6 @@
 package org.example.GUI.async;
 
-import org.example.Client.ProxyClient;
+import org.example.Controller.Client.ProxyClient;
 import org.example.Config.Constants;
 import org.example.Controller.APIController;
 
@@ -13,7 +13,8 @@ import java.util.concurrent.ExecutionException;
 
 public class AsyncCalls {
 
-    public void asyncPricingCall(ProxyClient proxyClient, int id, JLabel label, HashMap<String, Double> prices) {
+    public void asyncPricingCall(ProxyClient proxyClient, int id, JLabel label, HashMap<String, Double> prices,
+                                 HashMap<Integer, String> cachedPricing) {
         SwingWorker<HashMap<String, Double>, Void> worker = new SwingWorker<>() {
 
             @Override
@@ -28,7 +29,7 @@ public class AsyncCalls {
                     prices.clear();
                     prices.putAll(get());
                     String html = convertToHtml(prices);
-
+                    if (cachedPricing != null) { cachedPricing.put(id, html); }
                     label.setText(html);
                 } catch (InterruptedException | ExecutionException e) {
                     label.setText("Unavailable");
@@ -38,7 +39,7 @@ public class AsyncCalls {
         worker.execute();
     } // asyncPricingCall()
 
-    public void asyncThumbnailCall(String thumbUrl, JLabel label) {
+    public void asyncThumbnailCall(String thumbUrl, JLabel label, HashMap<Integer, ImageIcon> cachedImgs, int ID) {
         SwingWorker<ImageIcon, Void> worker = new SwingWorker<>() {
             @Override
             protected ImageIcon doInBackground() throws Exception {
@@ -50,7 +51,9 @@ public class AsyncCalls {
             @Override
             protected void done() {
                 try {
-                    label.setIcon(get());
+                    ImageIcon img = get();
+                    if (cachedImgs != null) { cachedImgs.put(ID, img); }
+                    label.setIcon(img);
                 } catch (InterruptedException | ExecutionException e) {
                     label.setIcon(Constants.defaultThumbNail);
                 }

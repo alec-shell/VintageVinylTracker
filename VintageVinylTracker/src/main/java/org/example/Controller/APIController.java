@@ -1,6 +1,6 @@
 package org.example.Controller;
 
-import org.example.Client.ProxyClient;
+import org.example.Controller.Client.ProxyClient;
 import org.example.Config.Constants;
 import org.example.DTO.Record;
 import org.example.DTO.SearchResult;

@@ -1,6 +1,6 @@
 package org.example.GUI;
 
-import org.example.Client.ProxyClient;
+import org.example.Controller.Client.ProxyClient;
 import org.example.Config.Constants;
 import org.example.Controller.APIController;
 import org.example.DTO.Record;
@@ -26,12 +26,17 @@ public class DiscogsUI extends JPanel {
     private final JTextField catNoJTF =  new JTextField();
     private JLabel albumArtLabel;
     private final JLabel pricingInfoLabel = new JLabel();
+
     private final ProxyClient proxyClient;
     private final DBAccessService dbAccess;
     private final EventTriggers eventTriggers;
     private final AsyncCalls asyncCalls;
+
     private ArrayList<Record> records;
     private final HashMap<String, Double> selectionPrices = new HashMap<>();
+    private final HashMap<Integer, String> cachedPricing = new HashMap<>();
+    private final HashMap<Integer, ImageIcon> cachedImgs =  new HashMap<>();
+
     private final Record noResultRecord = new Record(0, "NO RESULTS", "NO RESULTS",
             "NO RESULTS", "NO RESULTS", "NO RESULTS", null, false,
             0.0, 0.0, null);
@@ -59,8 +64,20 @@ public class DiscogsUI extends JPanel {
             if  (viewRow < 0) { return; }
             int rowIndex = discogsTable.convertRowIndexToModel(viewRow);
             if (records == null || records.size() <= rowIndex) { return; }
-            asyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel);
-            asyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel, selectionPrices);
+            Record record = records.get(rowIndex);
+            if (cachedImgs.containsKey(record.getID())) {
+                albumArtLabel.setIcon(cachedImgs.get(record.getID()));
+            } else {
+                asyncCalls.asyncThumbnailCall(record.getThumbUrl(), albumArtLabel, cachedImgs, record.getID());
+            }
+            if (cachedPricing.containsKey(record.getID())
+                    && !cachedPricing.get(record.getID()).equals("Unavailable")) {
+                pricingInfoLabel.setText(cachedPricing.get(record.getID()));
+            } else {
+                System.out.println("Attempting price query.");
+                asyncCalls.asyncPricingCall(proxyClient, record.getID(), pricingInfoLabel,
+                        selectionPrices, cachedPricing);
+            }
         });
     } // addTableListener()
 
@@ -206,12 +223,15 @@ public class DiscogsUI extends JPanel {
     } // buildSearchEntryForm()
 
     private void submitActionListener() {
-        searchDiscogs();
-        albumArtLabel.setIcon(Constants.defaultThumbNail);
-        pricingInfoLabel.setText("");
+        if (searchDiscogs()) {
+            albumArtLabel.setIcon(Constants.defaultThumbNail);
+            pricingInfoLabel.setText("");
+            cachedImgs.clear();
+            cachedPricing.clear();
+        }
     } // submitActionListener()
 
-    private void searchDiscogs() {
+    private boolean searchDiscogs() {
         String artist = !artistNameJTF.getText().isBlank() ? artistNameJTF.getText() : null;
         String album = !albumNameJTF.getText().isBlank() ? albumNameJTF.getText() : null;
         String year = !yearJTF.getText().isBlank() ? yearJTF.getText() : null;
@@ -220,8 +240,12 @@ public class DiscogsUI extends JPanel {
         pricingInfoLabel.setText("");
         if (artist == null && album == null && year == null && catNo == null) {
             pricingInfoLabel.setText("Please fill out at least one form field.");
+            return false;
         }
-        else asyncSearchQueryCall(album, artist, year, catNo);
+        else {
+            asyncSearchQueryCall(album, artist, year, catNo);
+            return true;
+        }
     } // searchDiscogs()
 
     private JPanel getEntryField(String fieldName, JTextField entryField) {

@@ -1,7 +1,7 @@
 package org.example.GUI;
 
-import org.example.Client.AuthorizationClient;
-import org.example.Client.ProxyClient;
+import org.example.Controller.Client.AuthorizationClient;
+import org.example.Controller.Client.ProxyClient;
 import org.example.Config.Constants;
 import org.example.Config.URIConfig;
 import org.example.GUI.async.AsyncCalls;

@@ -1,6 +1,6 @@
 package org.example.GUI;
 
-import org.example.Client.ProxyClient;
+import org.example.Controller.Client.ProxyClient;
 import org.example.Config.Constants;
 import org.example.Controller.StatsController;
 import org.example.DTO.CollectionStats;
@@ -28,7 +28,7 @@ public class StatsUI extends JPanel {
         this.proxyClient = proxyClient;
         this.setLayout(new BorderLayout());
         this.setBackground(Constants.bgColor);
-        this.collectionStats = StatsController.getInitialStats(dbAccessService);
+        this.collectionStats = StatsController.getStats(dbAccessService);
         buildPanel();
         if (collectionStats.getIsUpdating()) {
             updateStatsWorker();
@@ -54,8 +54,8 @@ public class StatsUI extends JPanel {
                 collectionStats.getMostValuableRecord().getThumbUrl() : "";
         String leastValUrl = collectionStats.getLeastValuableRecord() != null ?
                 collectionStats.getLeastValuableRecord().getThumbUrl() : "";
-        asyncCalls.asyncThumbnailCall(mostValUrl, mostValuableArtwork);
-        asyncCalls.asyncThumbnailCall(leastValUrl, leastValuableArtwork);
+        asyncCalls.asyncThumbnailCall(mostValUrl, mostValuableArtwork, null, 0);
+        asyncCalls.asyncThumbnailCall(leastValUrl, leastValuableArtwork, null, 0);
         displayPanel.add(buildAlbumContainer(collectionStats.getMostValuableRecord(),
                 "Most Valuable: ",  mostValuableArtwork, mostValuableText),  c);
         c.gridx = 2;
@@ -87,7 +87,7 @@ public class StatsUI extends JPanel {
     } // buildStatsJTA()
 
     public void updateStatsUI() {
-        collectionStats = StatsController.getInitialStats(dbAccessService);
+        collectionStats = StatsController.getStats(dbAccessService);
         Record mostValuableRecord = collectionStats.getMostValuableRecord();
         Record leastValuableRecord = collectionStats.getLeastValuableRecord();
         statsLbl.setText(buildStatsText());
@@ -95,8 +95,8 @@ public class StatsUI extends JPanel {
                 collectionStats.getMostValuableRecord().getThumbUrl() : "";
         String leastValUrl = collectionStats.getLeastValuableRecord() != null ?
                 collectionStats.getLeastValuableRecord().getThumbUrl() : "";
-        asyncCalls.asyncThumbnailCall(mostValUrl, mostValuableArtwork);
-        asyncCalls.asyncThumbnailCall(leastValUrl, leastValuableArtwork);
+        asyncCalls.asyncThumbnailCall(mostValUrl, mostValuableArtwork, null, 0);
+        asyncCalls.asyncThumbnailCall(leastValUrl, leastValuableArtwork, null, 0);
         mostValuableText.setText(buildAlbumText(mostValuableRecord));
         leastValuableText.setText(buildAlbumText(leastValuableRecord));
     } // updateStatsUI()

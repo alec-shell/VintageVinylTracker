@@ -1,6 +1,6 @@
 package org.example.GUI;
 
-import org.example.Client.ProxyClient;
+import org.example.Controller.Client.ProxyClient;
 import org.example.Config.Constants;
 import org.example.DTO.Record;
 import org.example.GUI.async.AsyncCalls;
@@ -24,12 +24,16 @@ public class DBSearchUI extends JPanel {
     private final JTextField yearJTF = new JTextField();
     private final JTextField catNoJTF = new JTextField();
     private final ButtonGroup ownedBtnGroup =  new ButtonGroup();
-    private ArrayList<Record> records;
     private JLabel albumArtLabel;
     private final JLabel pricingInfoLabel = new JLabel();
+
     private final ProxyClient proxyClient;
     private final AsyncCalls asyncCalls;
+
+    private ArrayList<Record> records;
     private final HashMap<String, Double> selectionPrices = new HashMap<>();
+    private final HashMap<Integer, String> cachedPricing = new HashMap<>();
+    private final HashMap<Integer, ImageIcon> cachedImgs =  new HashMap<>();
 
     public DBSearchUI(ProxyClient proxyClient, DBAccessService dbAccess, EventTriggers eventTriggers,
                       AsyncCalls asyncCalls) {
@@ -55,8 +59,20 @@ public class DBSearchUI extends JPanel {
             if  (viewRow < 0) { return; }
             int rowIndex = dbTable.convertRowIndexToModel(viewRow);
             if (records == null || records.size() <= rowIndex) { return; }
-            asyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel);
-            asyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel, selectionPrices);
+            Record record = records.get(rowIndex);
+            if (cachedImgs.containsKey(record.getID())) {
+                albumArtLabel.setIcon(cachedImgs.get(record.getID()));
+            } else {
+                asyncCalls.asyncThumbnailCall(records.get(rowIndex).getThumbUrl(), albumArtLabel,
+                        cachedImgs, record.getID());
+            }
+            if (cachedPricing.containsKey(record.getID())
+                    && !cachedPricing.get(record.getID()).equals("Unavailable")) {
+                pricingInfoLabel.setText(cachedPricing.get(record.getID()));
+            } else {
+                asyncCalls.asyncPricingCall(proxyClient, records.get(rowIndex).getID(), pricingInfoLabel,
+                        selectionPrices, cachedPricing);
+            }
         });
     } // addTableListener()
 
