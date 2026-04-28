@@ -31,7 +31,7 @@ public class ParseService {
         }
     } // parseConditionalPrices()
 
-    public static org.example.DTO.Record parseNodeToRecord(JsonNode node) {
+    public static Record parseNodeToRecord(JsonNode node) {
         int id = Integer.parseInt(node.path("id").asText());
         String[] title = node.path("title").asText().split(" - ");
         String artist = title[0];
@@ -48,6 +48,7 @@ public class ParseService {
     public static SearchResult parseSearchResults(String json) {
         ArrayList<Record> records = new ArrayList<>();
         boolean hasNextPage = false;
+        if (json == null || json.isEmpty()) { return new SearchResult(hasNextPage, records); }
         try {
             JsonNode jsonNode = mapper.readTree(json);
             hasNextPage = jsonNode.get("pagination").get("urls").has("next");
@@ -55,11 +56,11 @@ public class ParseService {
                 try {
                     records.add(ParseService.parseNodeToRecord(node));
                 } catch (Exception e) {
-                    System.out.println("Skipping invalid record: " + e.getMessage());
+                    System.err.println("Skipping invalid record");
                 }
             }
         } catch (IOException e) {
-            System.out.println("Could not complete search query: " + e.getMessage());
+            System.err.println("Malformed JSON received");
         }
         return new SearchResult(hasNextPage, records);
     } // parseSearchResults()

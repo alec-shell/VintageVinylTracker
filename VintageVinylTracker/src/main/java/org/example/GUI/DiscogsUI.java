@@ -74,7 +74,6 @@ public class DiscogsUI extends JPanel {
                     && !cachedPricing.get(record.getID()).equals("Unavailable")) {
                 pricingInfoLabel.setText(cachedPricing.get(record.getID()));
             } else {
-                System.out.println("Attempting price query.");
                 asyncCalls.asyncPricingCall(proxyClient, record.getID(), pricingInfoLabel,
                         selectionPrices, cachedPricing);
             }
