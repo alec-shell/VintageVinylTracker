@@ -13,4 +13,4 @@ public class PricingRequest {
         this.secret = secret;
     } // constructor
 
-} // PricingRequest class
+} // PricingRequest

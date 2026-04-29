@@ -122,4 +122,4 @@ public class Record {
 
     public final void setCondition(String condition) { this.condition = condition; } // setCondition()
 
-} // Record class
+} // Record

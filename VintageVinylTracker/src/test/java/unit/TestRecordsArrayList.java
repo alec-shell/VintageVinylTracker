@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class TestRecordsArrayList {
     
-    public ArrayList<Record> buildTestRecords() {
+    public static ArrayList<Record> buildTestRecords() {
         ArrayList<Record> testRecords = new ArrayList<>();
 
         testRecords.add(new Record(1, "Pink Floyd", "The Dark Side of the Moon", "1973",

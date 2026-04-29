@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ParseServiceTest {
     ArrayList<String> testJson = new ArrayList<>();
+
     @BeforeEach
     void setUp() throws IOException {
         Path path = Paths.get("src/test/java/unit/testJson");

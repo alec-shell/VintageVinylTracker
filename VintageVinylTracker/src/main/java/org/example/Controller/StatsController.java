@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import org.example.Controller.Client.ProxyClient;
+import org.example.Client.ProxyClient;
 import org.example.DTO.CollectionStats;
 import org.example.DTO.Record;
-import org.example.Service.DBAccessService;
+import org.example.Repository.DatabaseRepository;
 import org.example.Service.StatsService;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class StatsController {
     private static final ObjectMapper mapper = new JsonMapper();
 
-    public static CollectionStats getStats(DBAccessService dbAccessService) {
+    public static CollectionStats getStats(DatabaseRepository dbAccessService) {
         ArrayList<Record> ownedRecords = dbAccessService.searchRecordEntries(null,
                 null, null, null, "true");
         CollectionStats initStats = StatsService.parseOwnedAlbums(ownedRecords);
@@ -24,7 +24,7 @@ public class StatsController {
     } // initStats()
 
     public static void updateOwnedValues(ArrayList<Record> ownedRecords, ProxyClient proxyClient,
-                                                      DBAccessService dbAccessService) {
+                                                      DatabaseRepository dbAccessService) {
         for (Record record: ownedRecords) {
             updateRecordValue(record, proxyClient, dbAccessService);
         }
@@ -32,7 +32,7 @@ public class StatsController {
         dbAccessService.updateMetaDate();
     } // updateOwnedValues()
 
-    private static void updateRecordValue(Record record, ProxyClient proxyClient, DBAccessService dbAccess) {
+    private static void updateRecordValue(Record record, ProxyClient proxyClient, DatabaseRepository dbAccess) {
         try {
             String priceResponse = proxyClient.getPriceSuggestions(record.getID());
             JsonNode nodes = mapper.readTree(priceResponse);
@@ -44,4 +44,4 @@ public class StatsController {
         }
     } // updateRecordValue()
 
-}
+} // StatsController

@@ -26,5 +26,5 @@ public class StatsService {
         return new CollectionStats(albumCount, totalInvested, totalValue,
                 mostValuableRecord, leastValuableRecord, ownedRecords);
     } // parseOwnedAlbums()
-}
 
+} // StatsService

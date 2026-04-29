@@ -1,7 +1,7 @@
 package org.example.GUI.async;
 
-import org.example.Controller.Client.ProxyClient;
-import org.example.Config.Constants;
+import org.example.Client.ProxyClient;
+import org.example.Configurable.Constants;
 import org.example.Controller.APIController;
 
 import javax.imageio.ImageIO;
@@ -75,4 +75,4 @@ public class AsyncCalls {
         return returnString.toString();
     } // convertToHtml()
 
-} // AsyncCalls class
+} // AsyncCalls

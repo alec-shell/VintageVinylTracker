@@ -1,8 +1,7 @@
-package org.example.Config;
+package org.example.Configurable;
 
 import javax.swing.*;
 import java.awt.*;
-import java.net.URL;
 
 public class Constants {
 
@@ -50,4 +49,4 @@ public class Constants {
     // limits
     public static final int RESULTS_CAP = 250;
 
-}
+} // Constants

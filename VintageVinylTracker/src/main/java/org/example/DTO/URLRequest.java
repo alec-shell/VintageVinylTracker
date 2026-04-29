@@ -11,4 +11,4 @@ public class URLRequest {
         this.secret = secret;
     }
 
-} // VerifierURLRequest class
+} // URLRequest

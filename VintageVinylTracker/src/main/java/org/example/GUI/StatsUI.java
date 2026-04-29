@@ -1,11 +1,11 @@
 package org.example.GUI;
 
-import org.example.Controller.Client.ProxyClient;
-import org.example.Config.Constants;
+import org.example.Client.ProxyClient;
+import org.example.Configurable.Constants;
 import org.example.Controller.StatsController;
 import org.example.DTO.CollectionStats;
 import org.example.GUI.async.AsyncCalls;
-import org.example.Service.DBAccessService;
+import org.example.Repository.DatabaseRepository;
 import org.example.DTO.Record;
 
 import javax.swing.*;
@@ -14,7 +14,7 @@ import java.awt.*;
 public class StatsUI extends JPanel {
     private final AsyncCalls asyncCalls;
     private CollectionStats collectionStats;
-    private final DBAccessService dbAccessService;
+    private final DatabaseRepository dbAccessService;
     private final ProxyClient proxyClient;
     private JLabel statsLbl;
     private final JLabel mostValuableArtwork = new JLabel();
@@ -22,7 +22,7 @@ public class StatsUI extends JPanel {
     private final JLabel leastValuableText = new JLabel("", JLabel.CENTER);
     private final JLabel mostValuableText = new JLabel("", JLabel.CENTER);
 
-    public StatsUI(AsyncCalls asyncCalls, DBAccessService dbAccessService, ProxyClient proxyClient) {
+    public StatsUI(AsyncCalls asyncCalls, DatabaseRepository dbAccessService, ProxyClient proxyClient) {
         this.asyncCalls = asyncCalls;
         this.dbAccessService = dbAccessService;
         this.proxyClient = proxyClient;
@@ -148,4 +148,4 @@ public class StatsUI extends JPanel {
         worker.execute();
     } // updateStats()
 
-} // StatsUI class
+} // StatsUI

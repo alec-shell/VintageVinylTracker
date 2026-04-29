@@ -1,11 +1,11 @@
-package org.example.Controller.Client;
+package org.example.Client;
 
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import org.example.DTO.PricingRequest;
 import org.example.DTO.SearchRequest;
-import org.example.Config.URIConfig;
+import org.example.Configurable.URICollection;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
@@ -31,7 +31,7 @@ public class ProxyClient {
                     keyRing.getPassword("VintageVinyl", "userSecret"),
                     artist, album, year, catNo, pageNo));
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URIConfig.SEARCH_URI)
+                    .uri(URICollection.SEARCH_URI)
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
@@ -49,7 +49,7 @@ public class ProxyClient {
                             keyRing.getPassword("VintageVinyl", "userToken"),
                             keyRing.getPassword("VintageVinyl", "userSecret")));
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URIConfig.PRICING_URI)
+                    .uri(URICollection.PRICING_URI)
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
@@ -60,4 +60,4 @@ public class ProxyClient {
         }
     } // getPricingSuggestions()
 
-} // DiscogsClient class
+} // DiscogsClient

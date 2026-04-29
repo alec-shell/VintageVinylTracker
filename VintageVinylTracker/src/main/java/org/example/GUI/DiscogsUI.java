@@ -1,11 +1,11 @@
 package org.example.GUI;
 
-import org.example.Controller.Client.ProxyClient;
-import org.example.Config.Constants;
+import org.example.Client.ProxyClient;
+import org.example.Configurable.Constants;
 import org.example.Controller.APIController;
 import org.example.DTO.Record;
 import org.example.GUI.async.AsyncCalls;
-import org.example.Service.DBAccessService;
+import org.example.Repository.DatabaseRepository;
 import org.example.GUI.statsUpdate.EventTriggers;
 
 import javax.swing.*;
@@ -28,7 +28,7 @@ public class DiscogsUI extends JPanel {
     private final JLabel pricingInfoLabel = new JLabel();
 
     private final ProxyClient proxyClient;
-    private final DBAccessService dbAccess;
+    private final DatabaseRepository dbAccess;
     private final EventTriggers eventTriggers;
     private final AsyncCalls asyncCalls;
 
@@ -41,7 +41,7 @@ public class DiscogsUI extends JPanel {
             "NO RESULTS", "NO RESULTS", "NO RESULTS", null, false,
             0.0, 0.0, null);
 
-    public DiscogsUI(ProxyClient proxyClient, DBAccessService dbAccess, EventTriggers eventTriggers,
+    public DiscogsUI(ProxyClient proxyClient, DatabaseRepository dbAccess, EventTriggers eventTriggers,
                      AsyncCalls asyncCalls) {
         this.proxyClient = proxyClient;
         this.dbAccess = dbAccess;
@@ -311,4 +311,4 @@ public class DiscogsUI extends JPanel {
 
     } // CustomTableModel
 
-} // DiscogsUI class
+} // DiscogsUI

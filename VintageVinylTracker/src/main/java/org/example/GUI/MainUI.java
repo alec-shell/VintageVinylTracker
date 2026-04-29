@@ -1,11 +1,11 @@
 package org.example.GUI;
 
-import org.example.Controller.Client.AuthorizationClient;
-import org.example.Controller.Client.ProxyClient;
-import org.example.Config.Constants;
-import org.example.Config.URIConfig;
+import org.example.Client.AuthorizationClient;
+import org.example.Client.ProxyClient;
+import org.example.Configurable.Constants;
+import org.example.Configurable.URICollection;
 import org.example.GUI.async.AsyncCalls;
-import org.example.Service.DBAccessService;
+import org.example.Repository.DatabaseRepository;
 import org.example.GUI.statsUpdate.EventTriggers;
 
 import javax.swing.*;
@@ -25,14 +25,14 @@ public class MainUI extends JFrame {
     private final AuthorizationClient authorizationClient;
 
     public MainUI(ProxyClient proxyClient,
-                  DBAccessService dbAccess, AuthorizationClient authorizationClient,
+                  DatabaseRepository dbAccess, AuthorizationClient authorizationClient,
                   AsyncCalls asyncCalls, EventTriggers eventTriggers) {
         this.setTitle("Vintage Vinyl");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(1000, 600);
         this.setLayout(new BorderLayout());
         this.authorizationClient = authorizationClient;
-        final URL defaultURL = getClass().getResource(URIConfig.defaultIconImgPath);
+        final URL defaultURL = getClass().getResource(URICollection.defaultIconImgPath);
         setDefaultThumbNail(defaultURL);
         this.statsUI = new StatsUI(asyncCalls, dbAccess, proxyClient);
         eventTriggers.setStatsUI(statsUI);
@@ -121,4 +121,4 @@ public class MainUI extends JFrame {
         Constants.defaultThumbNail =  new ImageIcon(scaledDefaultThumbNail);
     }
 
-}
+} // MainUI

@@ -1,8 +1,8 @@
-package org.example.Config;
+package org.example.Configurable;
 
 import java.net.URI;
 
-public class URIConfig {
+public class URICollection {
 
     public static URI REQUEST_TOKEN_URI = URI.create("https://sowhatnow.us:8443/auth/r-tkn");
     public static URI REQUEST_VERIFIER_URI = URI.create("https://sowhatnow.us:8443/auth/url");
@@ -16,4 +16,5 @@ public class URIConfig {
 
     // default image src
     public static final String defaultIconImgPath = "/img/defaultThumbnail.jpg";
-} // URIConfig class
+
+} // URIConnection

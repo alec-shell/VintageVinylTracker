@@ -13,4 +13,4 @@ public class AuthTokenRequest {
         this.verifier = verifier;
     } // constructor
 
-} // AuthTokenRequest class
+} // AuthTokenRequest

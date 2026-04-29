@@ -65,4 +65,4 @@ public class CollectionStats {
 
     public void setIsUpdating(boolean isUpdating) {this.isUpdating = isUpdating;}
 
-}
+} // CollectionStats

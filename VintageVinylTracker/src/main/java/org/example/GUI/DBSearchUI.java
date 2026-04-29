@@ -1,10 +1,10 @@
 package org.example.GUI;
 
-import org.example.Controller.Client.ProxyClient;
-import org.example.Config.Constants;
+import org.example.Client.ProxyClient;
+import org.example.Configurable.Constants;
 import org.example.DTO.Record;
 import org.example.GUI.async.AsyncCalls;
-import org.example.Service.DBAccessService;
+import org.example.Repository.DatabaseRepository;
 import org.example.GUI.statsUpdate.EventTriggers;
 
 import javax.swing.*;
@@ -17,7 +17,7 @@ import java.util.HashMap;
 public class DBSearchUI extends JPanel {
     private final JTable dbTable;
     private final CustomTableModel tableModel =  new CustomTableModel();
-    private final DBAccessService dbAccess;
+    private final DatabaseRepository dbAccess;
     private final EventTriggers eventTriggers;
     private final JTextField albumNameJTF = new JTextField();
     private final JTextField artistNameJTF =  new JTextField();
@@ -35,7 +35,7 @@ public class DBSearchUI extends JPanel {
     private final HashMap<Integer, String> cachedPricing = new HashMap<>();
     private final HashMap<Integer, ImageIcon> cachedImgs =  new HashMap<>();
 
-    public DBSearchUI(ProxyClient proxyClient, DBAccessService dbAccess, EventTriggers eventTriggers,
+    public DBSearchUI(ProxyClient proxyClient, DatabaseRepository dbAccess, EventTriggers eventTriggers,
                       AsyncCalls asyncCalls) {
         this.dbAccess = dbAccess;
         this.proxyClient = proxyClient;
@@ -251,4 +251,4 @@ public class DBSearchUI extends JPanel {
 
     } // CustomTableModel
 
-} // DBSearchTabUI class
+} // DBSearchUI

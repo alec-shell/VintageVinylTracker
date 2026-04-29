@@ -14,8 +14,7 @@ public class StatsServiceTest {
 
     @Test
     public void parseOwnedAlbums_populatedRecordsArrayListTest() {
-        TestRecordsArrayList testRecordsArrayList = new TestRecordsArrayList();
-        ArrayList<Record> testRecords = testRecordsArrayList.buildTestRecords();
+        ArrayList<Record> testRecords = TestRecordsArrayList.buildTestRecords();
 
         CollectionStats testStats = StatsService.parseOwnedAlbums(testRecords);
 

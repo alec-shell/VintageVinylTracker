@@ -10,16 +10,20 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.github.javakeyring.BackendNotSupportedException;
 import com.github.javakeyring.Keyring;
-import org.example.Controller.Client.AuthorizationClient;
-import org.example.Controller.Client.ProxyClient;
+import org.example.Client.AuthorizationClient;
+import org.example.Client.ProxyClient;
+import org.example.Configurable.URICollection;
 import org.example.GUI.MainUI;
 import org.example.GUI.async.AsyncCalls;
-import org.example.Service.DBAccessService;
+import org.example.Repository.DatabaseRepository;
 import org.example.GUI.statsUpdate.EventTriggers;
+import org.example.Infrastructure.database.DatabaseInitializer;
+import org.example.Infrastructure.database.ConnectionFactory;
 
 import javax.swing.*;
 import java.awt.*;
 import java.net.http.HttpClient;
+import java.sql.Connection;
 import java.time.Duration;
 
 
@@ -48,8 +52,10 @@ public class Main {
         JsonMapper mapper = new JsonMapper();
         this.authorizationClient = new AuthorizationClient(httpClient, keyRing, mapper);
         ProxyClient proxyClient = new ProxyClient(httpClient, keyRing, mapper);
-        DBAccessService dbAccess = new DBAccessService();
-        dbAccess.initConnection();
+        Connection conn;
+        conn = ConnectionFactory.initConnection(URICollection.DB_URI);
+        DatabaseInitializer.initTables(conn);
+        DatabaseRepository dbAccess = new DatabaseRepository(conn);
         AsyncCalls asyncCalls = new AsyncCalls();
         EventTriggers eventTriggers = new EventTriggers();
         MainUI mainUI = new MainUI(proxyClient, dbAccess,
@@ -62,4 +68,4 @@ public class Main {
         Main main = new Main();
     } // main()
         
-} // TrackerUI class
+} // Main

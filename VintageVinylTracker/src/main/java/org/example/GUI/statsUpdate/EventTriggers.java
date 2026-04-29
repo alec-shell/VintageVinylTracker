@@ -17,4 +17,4 @@ public class EventTriggers {
         }
     } // updateStatsUI()
 
-} // EventTriggers class
+} // EventTriggers

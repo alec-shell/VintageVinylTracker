@@ -21,4 +21,4 @@ public class SearchRequest {
         this.pageNo = pageNo;
     }
 
-} // SearchRequest class
+} // SearchRequest

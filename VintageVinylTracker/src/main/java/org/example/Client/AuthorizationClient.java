@@ -1,4 +1,4 @@
-package org.example.Controller.Client;
+package org.example.Client;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -7,7 +7,7 @@ import com.github.javakeyring.Keyring;
 import com.github.javakeyring.PasswordAccessException;
 import org.example.DTO.AuthTokenRequest;
 import org.example.DTO.URLRequest;
-import org.example.Config.URIConfig;
+import org.example.Configurable.URICollection;
 
 import java.io.IOException;
 import java.net.http.HttpClient;
@@ -31,7 +31,7 @@ public class AuthorizationClient {
     public void getRequestToken() throws IOException, InterruptedException {
         HttpRequest request = HttpRequest
                 .newBuilder()
-                .uri(URIConfig.REQUEST_TOKEN_URI)
+                .uri(URICollection.REQUEST_TOKEN_URI)
                 .GET()
                 .build();
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -44,7 +44,7 @@ public class AuthorizationClient {
         String json = mapper.writeValueAsString(new URLRequest(requestTknDTO.token, requestTknDTO.secret));
         HttpRequest request = HttpRequest
                 .newBuilder()
-                .uri(URIConfig.REQUEST_VERIFIER_URI)
+                .uri(URICollection.REQUEST_VERIFIER_URI)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
@@ -58,7 +58,7 @@ public class AuthorizationClient {
         String json = mapper.writeValueAsString(requestTknDTO);
         HttpRequest request = HttpRequest
                 .newBuilder()
-                .uri(URIConfig.AUTH_TOKEN_URI)
+                .uri(URICollection.AUTH_TOKEN_URI)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .build();
@@ -79,7 +79,7 @@ public class AuthorizationClient {
             String json = mapper.writeValueAsString(new URLRequest(token, secret));
             HttpRequest request = HttpRequest
                     .newBuilder()
-                    .uri(URIConfig.AUTH_VERIFIER_URI)
+                    .uri(URICollection.AUTH_VERIFIER_URI)
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
@@ -103,4 +103,4 @@ public class AuthorizationClient {
         return url;
     } // getURL()
 
-} // AuthorizationClient class
+} // AuthorizationClient

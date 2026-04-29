@@ -2,7 +2,7 @@ package org.example.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.Config.Constants;
+import org.example.Configurable.Constants;
 import org.example.DTO.Record;
 import org.example.DTO.SearchResult;
 
