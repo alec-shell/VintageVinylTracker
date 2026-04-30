@@ -13,12 +13,14 @@ import com.github.javakeyring.Keyring;
 import org.example.Client.AuthorizationClient;
 import org.example.Client.ProxyClient;
 import org.example.Configurable.URICollection;
+import org.example.Controller.DatabaseController;
 import org.example.GUI.MainUI;
 import org.example.GUI.async.AsyncCalls;
 import org.example.Repository.DatabaseRepository;
 import org.example.GUI.statsUpdate.EventTriggers;
 import org.example.Infrastructure.database.DatabaseInitializer;
 import org.example.Infrastructure.database.ConnectionFactory;
+import org.example.Service.DatabaseService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,6 +31,7 @@ import java.time.Duration;
 
 public class Main {
     AuthorizationClient authorizationClient;
+    DatabaseService databaseService;
 
     public Main() {
         HttpClient httpClient = HttpClient
@@ -55,10 +58,12 @@ public class Main {
         Connection conn;
         conn = ConnectionFactory.initConnection(URICollection.DB_URI);
         DatabaseInitializer.initTables(conn);
-        DatabaseRepository dbAccess = new DatabaseRepository(conn);
         AsyncCalls asyncCalls = new AsyncCalls();
+        DatabaseRepository databaseRepository = new DatabaseRepository();
+        databaseService = new DatabaseService(conn, databaseRepository, URICollection.DB_URI);
+        DatabaseController databaseController = new DatabaseController(databaseService);
         EventTriggers eventTriggers = new EventTriggers();
-        MainUI mainUI = new MainUI(proxyClient, dbAccess,
+        MainUI mainUI = new MainUI(proxyClient, databaseController,
                 authorizationClient, asyncCalls, eventTriggers);
         mainUI.setVisible(true);
     } // constructor

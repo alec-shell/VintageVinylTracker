@@ -26,14 +26,21 @@ public class DatabaseInitializer {
         } catch (SQLException e) {
             System.err.println("Failed to initialize collection table: " + e.getMessage());
         }
-        String createMetadataTable = """
-                CREATE TABLE IF NOT EXISTS
-                Metadata(last_update DATE NOT NULL)
+        String createTable = """
+                CREATE TABLE IF NOT EXISTS Metadata(
+                id INTEGER PRIMARY KEY CHECK (id = 1),
+                last_update TIMESTAMP);
                 """;
-        try (PreparedStatement statement = conn.prepareStatement(createMetadataTable)) {
-            statement.execute();
+        String seedTable = "INSERT OR IGNORE INTO Metadata(id, last_update) VALUES (1, NULL);";
+        try (PreparedStatement createStmt = conn.prepareStatement(createTable)) {
+            createStmt.execute();
         } catch (SQLException e) {
             System.err.println("Failed to initialize metadata table: " + e.getMessage());
+        }
+        try (PreparedStatement seedStmt = conn.prepareStatement(seedTable)) {
+            seedStmt.execute();
+        } catch (SQLException e) {
+            System.err.println("Failed to seed Metadata table: " + e.getMessage());
         }
     } // initTables()
 

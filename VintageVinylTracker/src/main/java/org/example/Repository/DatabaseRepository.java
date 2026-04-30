@@ -7,27 +7,22 @@
 package org.example.Repository;
 
 
-import org.example.Configurable.URICollection;
 import org.example.DTO.Record;
-import org.example.Infrastructure.database.ConnectionFactory;
 
 import java.sql.*;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.chrono.ChronoLocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 
 public class DatabaseRepository {
-    private Connection conn;
 
-    public DatabaseRepository(Connection conn) {
-        this.conn = conn;
-    } // constructor
-
-    public final Boolean addRecordEntry(int id, String bandName, String albumName, String year,
+    public boolean addRecordEntry(int id, String bandName, String albumName, String year,
                                         String country, String catNo, String thumbUrl, boolean isOwned, double purchasePrice,
-                                        double value, String condition) {
-        if (!ConnectionFactory.isValidConnection(conn)) {
-            conn = ConnectionFactory.initConnection(URICollection.DB_URI);
-        }
+                                        double value, String condition, Connection conn) {
         String entryStmt = "INSERT INTO Vinyl(id, band_name, album_name, year, " +
                 "country, cat_no, thumb_url, is_owned, purchase_price, value, condition) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -43,21 +38,17 @@ public class DatabaseRepository {
             stmt.setDouble(9, purchasePrice);
             stmt.setDouble(10, value);
             stmt.setString(11, condition);
-            stmt.execute();
-            return true;
+            return stmt.executeUpdate() == 1;
         } catch (SQLException e) {
             System.err.println("SQL Exception... " + e.getMessage());
             return false;
         }
-    } // addEntry()
+    } // addRecordEntry()
 
-    public final ArrayList<Record> searchRecordEntries(
-            String bandName, String albumName, String year, String catNo, String isOwned) {
-        if (!ConnectionFactory.isValidConnection(conn)) {
-            conn = ConnectionFactory.initConnection(URICollection.DB_URI);
-        }
+    public ArrayList<Record> searchRecordEntries(String bandName, String albumName, String year, String catNo,
+                                                 String isOwned, Connection conn) {
         ArrayList<Record> resultsList = new ArrayList<>();
-        try(PreparedStatement stmt = buildRecordSearchStmt(bandName, albumName, year, catNo, isOwned)) {
+        try(PreparedStatement stmt = buildRecordSearchStmt(bandName, albumName, year, catNo, isOwned, conn)) {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Record temp = new Record(rs.getInt("id"),
@@ -80,10 +71,7 @@ public class DatabaseRepository {
         return resultsList;
     } // searchRecordEntries()
 
-    public boolean deleteRecordEntry(int id) {
-        if (!ConnectionFactory.isValidConnection(conn)) {
-            conn = ConnectionFactory.initConnection(URICollection.DB_URI);
-        }
+    public boolean deleteRecordEntry(int id, Connection conn) {
         String deleteStmt = "DELETE FROM Vinyl WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(deleteStmt)) {
             stmt.setInt(1, id);
@@ -94,11 +82,43 @@ public class DatabaseRepository {
         }
     } // deleteRecordEntry()
 
-    private PreparedStatement buildRecordSearchStmt(String bandName, String albumName, String year,
-                                                    String catNo, String isOwned) throws SQLException {
-        if (!ConnectionFactory.isValidConnection(conn)) {
-            conn = ConnectionFactory.initConnection(URICollection.DB_URI);
+    public boolean checkForUpdate(Connection conn) {
+        String stmt = "SELECT last_update FROM Metadata WHERE id = 1;";
+        try (PreparedStatement ps = conn.prepareStatement(stmt)) {
+            ResultSet rs = ps.executeQuery();
+            if (!rs.next()) { return true; }
+            Timestamp stamp = rs.getTimestamp("last_update");
+            return stamp == null || stamp.toInstant().plus(24, ChronoUnit.HOURS).isBefore(Instant.now());
+        } catch (SQLException e) {
+            System.err.println("SQL Exception on last_update... " + e.getMessage());
+            return true;
         }
+    } // checkForUpdate()
+
+    public boolean updateRecordPrice(int id, double newPrice, Connection conn) {
+        String updateStmt =  "UPDATE Vinyl SET value = ? WHERE id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(updateStmt)) {
+            ps.setDouble(1, newPrice);
+            ps.setInt(2, id);
+            return ps.executeUpdate() == 1;
+        } catch (SQLException e) {
+            System.err.println("SQL Exception... " + e.getMessage());
+            return false;
+        }
+    } // updateRecordPrice()
+
+    public void updateMetaDate(Connection conn) {
+        String sql = "UPDATE Metadata SET last_update = ? WHERE id = 1;";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    } // updateMetaDate()
+
+    private PreparedStatement buildRecordSearchStmt(String bandName, String albumName, String year,
+                                                    String catNo, String isOwned, Connection conn) throws SQLException {
         // build out search query conditionally
         StringBuilder stmtSB =  new StringBuilder();
         stmtSB.append("SELECT * FROM Vinyl WHERE 1=1");
@@ -120,59 +140,5 @@ public class DatabaseRepository {
         }
         return ps;
     } // buildRecordSearchStmt()
-
-    public boolean checkForOwnedPricingUpdate() {
-        if (!ConnectionFactory.isValidConnection(conn)) {
-            conn = ConnectionFactory.initConnection(URICollection.DB_URI);
-        }
-        String stmt = "SELECT last_update FROM Metadata";
-        try (PreparedStatement ps = conn.prepareStatement(stmt)) {
-            ResultSet rs = ps.executeQuery();
-            if (!rs.next()) {return true;}
-            Date date = rs.getDate("last_update");
-            return date != null && !date.equals(Date.valueOf(LocalDate.now()));
-        } catch (SQLException e) {
-            System.err.println("SQL Exception... " + e.getMessage());
-            return true;
-        }
-    } // checkForUpdate()
-
-    public boolean updateRecordPrice(int id, double newPrice) {
-        if (!ConnectionFactory.isValidConnection(conn)) {
-            conn = ConnectionFactory.initConnection(URICollection.DB_URI);
-        }
-        String updateStmt =  "UPDATE Vinyl SET value = ? WHERE id = ?";
-        try (PreparedStatement ps = conn.prepareStatement(updateStmt)) {
-            ps.setDouble(1, newPrice);
-            ps.setInt(2, id);
-            return ps.executeUpdate() == 1;
-        } catch (SQLException e) {
-            System.err.println("SQL Exception... " + e.getMessage());
-            return false;
-        }
-    } // updateRecordPrice()
-
-    public void updateMetaDate() {
-        if (!ConnectionFactory.isValidConnection(conn)) {
-            conn = ConnectionFactory.initConnection(URICollection.DB_URI);
-        }
-        String dateStmt = "UPDATE Metadata SET last_update = ?";
-        int rowsUpdated = 0;
-        try (PreparedStatement ps = conn.prepareStatement(dateStmt)) {
-            ps.setDate(1, Date.valueOf(LocalDate.now()));
-            rowsUpdated = ps.executeUpdate();
-        } catch (SQLException e) {
-            System.err.println("SQL Exception... " + e.getMessage());
-        }
-        if (rowsUpdated == 0) {
-            String initStmt = "INSERT INTO Metadata (last_update) VALUES (?)";
-            try (PreparedStatement ps = conn.prepareStatement(initStmt)) {
-                ps.setDate(1, Date.valueOf(LocalDate.now()));
-                ps.executeUpdate();
-            } catch (SQLException e) {
-                System.err.println("SQL Exception... " + e.getMessage());
-            }
-        }
-    } // updateMetaDate()
 
 } // DatabaseRepository

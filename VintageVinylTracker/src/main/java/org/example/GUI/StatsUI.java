@@ -2,6 +2,7 @@ package org.example.GUI;
 
 import org.example.Client.ProxyClient;
 import org.example.Configurable.Constants;
+import org.example.Controller.DatabaseController;
 import org.example.Controller.StatsController;
 import org.example.DTO.CollectionStats;
 import org.example.GUI.async.AsyncCalls;
@@ -14,7 +15,7 @@ import java.awt.*;
 public class StatsUI extends JPanel {
     private final AsyncCalls asyncCalls;
     private CollectionStats collectionStats;
-    private final DatabaseRepository dbAccessService;
+    private final DatabaseController databaseController;
     private final ProxyClient proxyClient;
     private JLabel statsLbl;
     private final JLabel mostValuableArtwork = new JLabel();
@@ -22,13 +23,13 @@ public class StatsUI extends JPanel {
     private final JLabel leastValuableText = new JLabel("", JLabel.CENTER);
     private final JLabel mostValuableText = new JLabel("", JLabel.CENTER);
 
-    public StatsUI(AsyncCalls asyncCalls, DatabaseRepository dbAccessService, ProxyClient proxyClient) {
+    public StatsUI(AsyncCalls asyncCalls, DatabaseController databaseController, ProxyClient proxyClient) {
         this.asyncCalls = asyncCalls;
-        this.dbAccessService = dbAccessService;
+        this.databaseController = databaseController;
         this.proxyClient = proxyClient;
         this.setLayout(new BorderLayout());
         this.setBackground(Constants.bgColor);
-        this.collectionStats = StatsController.getStats(dbAccessService);
+        this.collectionStats = StatsController.getStats(databaseController);
         buildPanel();
         if (collectionStats.getIsUpdating()) {
             updateStatsWorker();
@@ -87,7 +88,7 @@ public class StatsUI extends JPanel {
     } // buildStatsJTA()
 
     public void updateStatsUI() {
-        collectionStats = StatsController.getStats(dbAccessService);
+        collectionStats = StatsController.getStats(databaseController);
         Record mostValuableRecord = collectionStats.getMostValuableRecord();
         Record leastValuableRecord = collectionStats.getLeastValuableRecord();
         statsLbl.setText(buildStatsText());
@@ -136,7 +137,7 @@ public class StatsUI extends JPanel {
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() {
-                StatsController.updateOwnedValues(collectionStats.getOwnedRecords(), proxyClient, dbAccessService);
+                StatsController.updateOwnedValues(collectionStats.getOwnedRecords(), proxyClient, databaseController);
                 return null;
             } // doInBackground()
 

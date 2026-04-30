@@ -4,7 +4,7 @@ import org.example.Client.ProxyClient;
 import org.example.Configurable.Constants;
 import org.example.DTO.Record;
 import org.example.GUI.async.AsyncCalls;
-import org.example.Repository.DatabaseRepository;
+import org.example.Controller.DatabaseController;
 import org.example.GUI.statsUpdate.EventTriggers;
 
 import javax.swing.*;
@@ -17,7 +17,7 @@ import java.util.HashMap;
 public class DBSearchUI extends JPanel {
     private final JTable dbTable;
     private final CustomTableModel tableModel =  new CustomTableModel();
-    private final DatabaseRepository dbAccess;
+    private final DatabaseController databaseController;
     private final EventTriggers eventTriggers;
     private final JTextField albumNameJTF = new JTextField();
     private final JTextField artistNameJTF =  new JTextField();
@@ -35,9 +35,9 @@ public class DBSearchUI extends JPanel {
     private final HashMap<Integer, String> cachedPricing = new HashMap<>();
     private final HashMap<Integer, ImageIcon> cachedImgs =  new HashMap<>();
 
-    public DBSearchUI(ProxyClient proxyClient, DatabaseRepository dbAccess, EventTriggers eventTriggers,
+    public DBSearchUI(ProxyClient proxyClient, DatabaseController databaseController, EventTriggers eventTriggers,
                       AsyncCalls asyncCalls) {
-        this.dbAccess = dbAccess;
+        this.databaseController = databaseController;
         this.proxyClient = proxyClient;
         this.eventTriggers = eventTriggers;
         this.asyncCalls = asyncCalls;
@@ -97,7 +97,7 @@ public class DBSearchUI extends JPanel {
         int selectedIndex = dbTable.getSelectedRow();
         if (records == null || records.size() <= selectedIndex || selectedIndex < 0) {return;}
         int modelRow = dbTable.convertRowIndexToModel(selectedIndex);
-        boolean deleted = dbAccess.deleteRecordEntry(records.get(modelRow).getID());
+        boolean deleted = databaseController.deleteRecordEntry(records.get(modelRow).getID());
         if (deleted) {
             eventTriggers.updateStatsUI();
             records.remove(modelRow);
@@ -197,7 +197,7 @@ public class DBSearchUI extends JPanel {
         String album = !albumNameJTF.getText().isBlank() ? albumNameJTF.getText() : null;
         String year = !yearJTF.getText().isBlank() ? yearJTF.getText() : null;
         String catNo = !catNoJTF.getText().isBlank() ? catNoJTF.getText() : null;
-        return dbAccess.searchRecordEntries(artist, album, year, catNo, ownedBtnGroup.getSelection().getActionCommand());
+        return databaseController.searchRecordEntries(artist, album, year, catNo, ownedBtnGroup.getSelection().getActionCommand());
     } // searchDB()
 
     private JPanel getEntryField(String fieldName, JTextField entryField) {

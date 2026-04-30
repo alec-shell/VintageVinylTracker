@@ -3,9 +3,9 @@ package org.example.GUI;
 import org.example.Client.ProxyClient;
 import org.example.Configurable.Constants;
 import org.example.Controller.APIController;
+import org.example.Controller.DatabaseController;
 import org.example.DTO.Record;
 import org.example.GUI.async.AsyncCalls;
-import org.example.Repository.DatabaseRepository;
 import org.example.GUI.statsUpdate.EventTriggers;
 
 import javax.swing.*;
@@ -28,7 +28,7 @@ public class DiscogsUI extends JPanel {
     private final JLabel pricingInfoLabel = new JLabel();
 
     private final ProxyClient proxyClient;
-    private final DatabaseRepository dbAccess;
+    private final DatabaseController databaseController;
     private final EventTriggers eventTriggers;
     private final AsyncCalls asyncCalls;
 
@@ -41,10 +41,10 @@ public class DiscogsUI extends JPanel {
             "NO RESULTS", "NO RESULTS", "NO RESULTS", null, false,
             0.0, 0.0, null);
 
-    public DiscogsUI(ProxyClient proxyClient, DatabaseRepository dbAccess, EventTriggers eventTriggers,
+    public DiscogsUI(ProxyClient proxyClient, DatabaseController databaseController, EventTriggers eventTriggers,
                      AsyncCalls asyncCalls) {
         this.proxyClient = proxyClient;
-        this.dbAccess = dbAccess;
+        this.databaseController = databaseController;
         this.eventTriggers = eventTriggers;
         this.asyncCalls = asyncCalls;
         this.setLayout(new BorderLayout());
@@ -144,7 +144,7 @@ public class DiscogsUI extends JPanel {
     } // addOwnedAlbum()
 
     private boolean sendAlbumToDB(Record selected) {
-        boolean added = dbAccess.addRecordEntry(
+        boolean added = databaseController.addRecordEntry(
                 selected.getID(),
                 selected.getArtistName(),
                 selected.getAlbumName(),
