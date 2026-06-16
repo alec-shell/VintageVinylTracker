@@ -16,7 +16,7 @@ public class DatabaseController {
                                   String country, String catNo, String thumbUrl, boolean isOwned, double purchasePrice,
                                   double value, String condition) {
         return databaseService.addRecordEntry(id, bandName, albumName, year, country, catNo,
-                thumbUrl, isOwned, purchasePrice, value,condition);
+                thumbUrl, isOwned, purchasePrice, value, condition);
     }
 
     public ArrayList<Record> searchRecordEntries(String bandName, String albumName, String year, String catNo,

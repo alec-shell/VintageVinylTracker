@@ -15,7 +15,7 @@ public class Record {
     private String thumbUrl;
     private boolean isOwned;
     private Double purchasePrice;
-    private Double value;
+    private double value;
     private String condition;
 
     public Record(int id,
@@ -118,7 +118,7 @@ public class Record {
 
     public final void setPurchasePrice(Double purchasePrice) { this.purchasePrice = purchasePrice; } // setPurchasePrice()
 
-    public final void setValue(Double value) { this.value = value; } // setValue()
+    public final void setValue(double value) { this.value = value; } // setValue()
 
     public final void setCondition(String condition) { this.condition = condition; } // setCondition()
 

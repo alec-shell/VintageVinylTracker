@@ -139,7 +139,10 @@ public class DiscogsUI extends JPanel {
                 Constants.pricingConditions[0]
         );
         selected.setCondition(condition);
-        selected.setValue(selectionPrices.get(condition));
+        Double selectionPrice = selectionPrices.get(condition);
+        if (selectionPrice != null) selected.setValue(selectionPrice);
+        else selected.setValue(0.00);
+
         if (sendAlbumToDB(selected)) eventTriggers.updateStatsUI();
     } // addOwnedAlbum()
 
