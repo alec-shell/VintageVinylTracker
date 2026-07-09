@@ -1,6 +1,5 @@
 package org.example.Infrastructure.database;
 
-import org.example.Configurable.URICollection;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

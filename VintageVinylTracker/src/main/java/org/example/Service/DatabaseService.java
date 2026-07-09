@@ -50,7 +50,7 @@ public class DatabaseService {
 
     public void updateMetaDate() {
         checkConnection();
-        updateMetaDate();
+        databaseRepository.updateMetaDate(conn);
     } // updateMetaDate()
 
     private void checkConnection() {

@@ -5,6 +5,7 @@ import org.example.Client.ProxyClient;
 import org.example.Configurable.Constants;
 import org.example.Configurable.URICollection;
 import org.example.Controller.DatabaseController;
+import org.example.Controller.StatsController;
 import org.example.GUI.async.AsyncCalls;
 import org.example.GUI.statsUpdate.EventTriggers;
 
@@ -26,7 +27,7 @@ public class MainUI extends JFrame {
 
     public MainUI(ProxyClient proxyClient,
                   DatabaseController databaseController, AuthorizationClient authorizationClient,
-                  AsyncCalls asyncCalls, EventTriggers eventTriggers) {
+                  AsyncCalls asyncCalls, EventTriggers eventTriggers, StatsController statsController) {
         this.setTitle("Vintage Vinyl");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(1000, 600);
@@ -34,7 +35,7 @@ public class MainUI extends JFrame {
         this.authorizationClient = authorizationClient;
         final URL defaultURL = getClass().getResource(URICollection.defaultIconImgPath);
         setDefaultThumbNail(defaultURL);
-        this.statsUI = new StatsUI(asyncCalls, databaseController, proxyClient);
+        this.statsUI = new StatsUI(asyncCalls, databaseController, proxyClient, statsController);
         eventTriggers.setStatsUI(statsUI);
         this.dbSearchUI = new DBSearchUI(proxyClient, databaseController, eventTriggers, asyncCalls);
         this.discogsUI = new DiscogsUI(proxyClient, databaseController, eventTriggers, asyncCalls);

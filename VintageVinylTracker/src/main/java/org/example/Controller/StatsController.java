@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class StatsController {
     private static final ObjectMapper mapper = new JsonMapper();
 
-    public static CollectionStats getStats(DatabaseController databaseController) {
+    public CollectionStats getStats(DatabaseController databaseController) {
         ArrayList<Record> ownedRecords = databaseController.searchRecordEntries(null,
                 null, null, null, "true");
         CollectionStats initStats = StatsService.parseOwnedAlbums(ownedRecords);
@@ -22,7 +22,7 @@ public class StatsController {
         return initStats;
     } // initStats()
 
-    public static void updateOwnedValues(ArrayList<Record> ownedRecords, ProxyClient proxyClient,
+    public void updateOwnedValues(ArrayList<Record> ownedRecords, ProxyClient proxyClient,
                                                       DatabaseController databaseController) {
         for (Record record: ownedRecords) {
             updateRecordValue(record, proxyClient, databaseController);
@@ -31,7 +31,7 @@ public class StatsController {
         databaseController.updateMetaDate();
     } // updateOwnedValues()
 
-    private static void updateRecordValue(Record record, ProxyClient proxyClient, DatabaseController databaseController) {
+    private void updateRecordValue(Record record, ProxyClient proxyClient, DatabaseController databaseController) {
         try {
             String priceResponse = proxyClient.getPriceSuggestions(record.getID());
             JsonNode nodes = mapper.readTree(priceResponse);

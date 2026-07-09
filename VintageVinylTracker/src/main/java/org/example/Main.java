@@ -14,6 +14,7 @@ import org.example.Client.AuthorizationClient;
 import org.example.Client.ProxyClient;
 import org.example.Configurable.URICollection;
 import org.example.Controller.DatabaseController;
+import org.example.Controller.StatsController;
 import org.example.GUI.MainUI;
 import org.example.GUI.async.AsyncCalls;
 import org.example.Repository.DatabaseRepository;
@@ -62,9 +63,10 @@ public class Main {
         DatabaseRepository databaseRepository = new DatabaseRepository();
         databaseService = new DatabaseService(conn, databaseRepository, URICollection.DB_URI);
         DatabaseController databaseController = new DatabaseController(databaseService);
+        StatsController statsController = new StatsController();
         EventTriggers eventTriggers = new EventTriggers();
         MainUI mainUI = new MainUI(proxyClient, databaseController,
-                authorizationClient, asyncCalls, eventTriggers);
+                authorizationClient, asyncCalls, eventTriggers, statsController);
         mainUI.setVisible(true);
     } // constructor
 
